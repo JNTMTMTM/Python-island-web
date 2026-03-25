@@ -1,0 +1,102 @@
+/* ── Animations & keyframes ─────────────────────────────────────────────── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animateFadeInUp {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animateFadeIn {
+  animation: fadeIn 1s ease forwards;
+}
+
+.animateSlideInLeft {
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animateSlideInRight {
+  animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animationDelay100 { animation-delay: 100ms; }
+.animationDelay200 { animation-delay: 200ms; }
+.animationDelay300 { animation-delay: 300ms; }
+.animationDelay400 { animation-delay: 400ms; }
+.animationDelay500 { animation-delay: 500ms; }
+.animationDelay600 { animation-delay: 600ms; }
+.animationDelay700 { animation-delay: 700ms; }
+.animationDelay800 { animation-delay: 800ms; }
+
+.staggerChildren > * {
+  opacity: 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.staggerChildren > *:nth-child(1) { animation-delay: 0ms; }
+.staggerChildren > *:nth-child(2) { animation-delay: 100ms; }
+.staggerChildren > *:nth-child(3) { animation-delay: 200ms; }
+.staggerChildren > *:nth-child(4) { animation-delay: 300ms; }
+.staggerChildren > *:nth-child(5) { animation-delay: 400ms; }
+.staggerChildren > *:nth-child(6) { animation-delay: 500ms; }

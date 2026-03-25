@@ -1,0 +1,23 @@
+/* ── Visual effects ─────────────────────────────────────────────────────── */
+
+.gradientText {
+  background: linear-gradient(135deg, #FAFAFA 0%, #D4D4D8 50%, #71717A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradientTextAccent {
+  background: linear-gradient(135deg, #A1A1AA, #71717A, #52525B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glowAccent {
+  box-shadow: 0 0 40px rgba(161, 161, 170, 0.15), 0 0 80px rgba(161, 161, 170, 0.08);
+}
+
+.glowBorder {
+  box-shadow: inset 0 0 20px rgba(161, 161, 170, 0.08), 0 0 20px rgba(161, 161, 170, 0.08);
+}
