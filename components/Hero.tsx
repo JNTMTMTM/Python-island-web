@@ -88,6 +88,42 @@ export default function Hero() {
         }}
       />
 
+      {/* CTA Buttons Overlay - Fixed at bottom of hero, highest z-index */}
+      <div
+        className={`${styles.animateFadeInUp} ${styles.animationDelay200}`}
+        style={{
+          position: 'absolute',
+          bottom: '120px',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px',
+          justifyContent: 'center',
+          zIndex: 9999,
+          opacity: 0,
+        }}
+      >
+        <Link
+          href="/download"
+          className={stylesButton.btnPrimary}
+          onMouseEnter={() => threeRef.current?.setHover(true)}
+          onMouseLeave={() => threeRef.current?.setHover(false)}
+        >
+          <Download size={16} />
+          立即下载
+        </Link>
+        <Link
+          href="/developers"
+          className={stylesButton.btnSecondary}
+          onMouseEnter={() => threeRef.current?.setHover(true)}
+          onMouseLeave={() => threeRef.current?.setHover(false)}
+        >
+          <Github size={16} />
+          开发者文档
+        </Link>
+      </div>
+
       {/* Content - centered, below the 3D island */}
       <div
         style={{
@@ -129,37 +165,6 @@ export default function Hero() {
           >
             Windows 灵动岛新时代 — 用 Python 开发，为 Windows 打造现代控制中心
           </p>
-        </div>
-
-        {/* CTA buttons */}
-        <div
-          className={`${styles.animateFadeInUp} ${styles.animationDelay200}`}
-          style={{
-            opacity: 0,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
-            justifyContent: 'center',
-          }}
-        >
-          <Link
-            href="/download"
-            className={stylesButton.btnPrimary}
-            onMouseEnter={() => threeRef.current?.setHover(true)}
-            onMouseLeave={() => threeRef.current?.setHover(false)}
-          >
-            <Download size={16} />
-            立即下载
-          </Link>
-          <Link
-            href="/developers"
-            className={stylesButton.btnSecondary}
-            onMouseEnter={() => threeRef.current?.setHover(true)}
-            onMouseLeave={() => threeRef.current?.setHover(false)}
-          >
-            <Github size={16} />
-            开发者文档
-          </Link>
         </div>
       </div>
 
