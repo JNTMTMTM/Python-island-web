@@ -10,8 +10,6 @@ const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#developers'];
 export default function DynamicIsland() {
   const [isHovered, setIsHovered] = useState(false);
   const [activePage, setActivePage] = useState<NavPage>('#hero');
-  /** Once true, stays true — prevents island from re-appearing after visiting developers */
-  const [hideForDevelopers, setHideForDevelopers] = useState(false);
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
   const developersBtnRef = useRef<HTMLButtonElement>(null);
@@ -31,9 +29,7 @@ export default function DynamicIsland() {
 
     const handleHashChange = () => updateActivePage();
     const handleNavigate = (e: Event) => {
-      const hash = (e as CustomEvent).detail.hash as NavPage;
-      if (hash === '#developers') setHideForDevelopers(true);
-      setActivePage(hash);
+      setActivePage((e as CustomEvent).detail.hash as NavPage);
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -103,7 +99,7 @@ export default function DynamicIsland() {
     updateIndicator();
   }, [activePage]);
 
-  const isHidden = hideForDevelopers;
+  const isHidden = activePage === '#developers';
 
   return (
     <div
