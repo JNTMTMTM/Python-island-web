@@ -9,8 +9,6 @@ const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#developers'];
 
 export default function DynamicIsland() {
   const [isHovered, setIsHovered] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [activePage, setActivePage] = useState<NavPage>('#hero');
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
@@ -101,20 +99,7 @@ export default function DynamicIsland() {
     updateIndicator();
   }, [activePage]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  const isHidden = activePage === '#developers';
 
   return (
     <div
@@ -122,13 +107,13 @@ export default function DynamicIsland() {
         position: 'fixed',
         top: '24px',
         left: '50%',
-        transform: `translateX(-50%) translateY(${isScrolled ? '-100px' : '0'})`,
+        transform: `translateX(-50%) translateY(${isHidden ? '-100px' : '0'})`,
         zIndex: 200,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        pointerEvents: isScrolled ? 'none' : 'auto',
-        opacity: isScrolled ? 0 : 1,
+        pointerEvents: isHidden ? 'none' : 'auto',
+        opacity: isHidden ? 0 : 1,
         transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
       }}
     >
