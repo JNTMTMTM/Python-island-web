@@ -33,8 +33,8 @@ export const SCENE_CONFIG = {
 
   // Pill body
   pill: {
-    radius: 0.6,
-    length: 1.8,
+    radius: 0.55,
+    length: 1.65,
     tubeSegments: 16,
     radialSegments: 48,
     material: {
@@ -67,7 +67,7 @@ export const SCENE_CONFIG = {
     tubeSegments: 8,
     radialSegments: 180,
     colors: [0x71717a, 0xa1a1aa, 0xd4d4d8],
-    opacities: [0.04, 0.15, 0.05],
+    opacities: [0.04, 0.04, 0.04],
     rotations: [
       { x: Math.PI * 0.2, y: 0, z: Math.PI * 0.15 },
       { x: Math.PI * 0.2, y: 0.7, z: Math.PI * 0.15 },
