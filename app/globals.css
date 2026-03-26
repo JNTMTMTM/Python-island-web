@@ -12,3 +12,10 @@
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* macOS desktop animated background */
+@keyframes macBgShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
