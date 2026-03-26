@@ -1,17 +1,54 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { Github } from 'lucide-react';
 
 export default function DynamicIsland() {
   const [isHovered, setIsHovered] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [activePage, setActivePage] = useState('');
+  const featuresBtnRef = useRef<HTMLButtonElement>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   const navigate = useCallback((hash: string) => {
     history.pushState(null, '', window.location.pathname + hash);
     window.dispatchEvent(new CustomEvent('pyisland:navigate', { detail: { hash } }));
   }, []);
+
+  useEffect(() => {
+    const updateActivePage = () => {
+      const hash = window.location.hash || '#hero';
+      setActivePage(hash);
+    };
+    updateActivePage();
+
+    const handleHashChange = () => updateActivePage();
+    const handleNavigate = (e: Event) => {
+      setActivePage((e as CustomEvent).detail.hash);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('pyisland:navigate', handleNavigate);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('pyisland:navigate', handleNavigate);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const updateIndicator = () => {
+      if (featuresBtnRef.current) {
+        const btn = featuresBtnRef.current;
+        setIndicatorStyle({
+          left: btn.offsetLeft + 6,
+          width: btn.offsetWidth - 12,
+          opacity: activePage === '#features' ? 1 : 0,
+        });
+      }
+    };
+    updateIndicator();
+  }, [activePage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -125,32 +162,44 @@ export default function DynamicIsland() {
           />
 
           {/* Nav links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <div
+            onMouseEnter={(e) => e.stopPropagation()}
+            onMouseLeave={(e) => e.stopPropagation()}
+            style={{ display: 'flex', alignItems: 'center', gap: '2px', position: 'relative' }}
+          >
             <button
+              ref={featuresBtnRef}
               onClick={() => navigate('#features')}
               style={{
                 padding: '4px 10px',
                 borderRadius: '8px',
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#71717a',
-                textDecoration: 'none',
-                transition: 'color 0.2s ease, background 0.2s ease',
+                color: activePage === '#features' ? '#ffffff' : '#71717a',
+                transition: 'color 0.2s ease',
                 cursor: 'pointer',
                 background: 'none',
                 border: 'none',
               }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.color = '#fafafa';
-                (e.target as HTMLElement).style.background = 'rgba(255, 255, 255, 0.08)';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.color = '#71717a';
-                (e.target as HTMLElement).style.background = 'transparent';
-              }}
+              className="diNavBtn"
             >
               功能
             </button>
+            {/* Active indicator underline */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '2px',
+                left: indicatorStyle.left,
+                width: indicatorStyle.width,
+                height: '1.5px',
+                borderRadius: '1px',
+                background: 'rgba(255, 255, 255, 0.6)',
+                transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
+                opacity: indicatorStyle.opacity,
+                pointerEvents: 'none',
+              }}
+            />
           </div>
 
           {/* Divider */}

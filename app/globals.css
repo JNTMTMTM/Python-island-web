@@ -6,3 +6,8 @@
 @import '../styles/animation.module.css';
 @import '../styles/effect.module.css';
 @import '../styles/layout.module.css';
+
+/* Dynamic Island nav button hover — forces white on hover over any JS re-render */
+.diNavBtn:hover {
+  color: #ffffff !important;
+}
