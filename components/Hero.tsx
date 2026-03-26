@@ -120,7 +120,7 @@ export default function Hero() {
           onMouseLeave={() => threeRef.current?.setHover(false)}
         >
           <Github size={16} />
-          开发者文档
+          开发文档
         </Link>
       </div>
 
@@ -194,7 +194,7 @@ export default function Hero() {
             textTransform: 'uppercase',
           }}
         >
-          Scroll
+          向下滚动
         </span>
         <div
           style={{

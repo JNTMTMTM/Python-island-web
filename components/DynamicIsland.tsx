@@ -66,10 +66,10 @@ export default function DynamicIsland() {
           style={{
             position: 'relative',
             borderRadius: '28px',
-            background: 'rgba(255, 255, 255, 0.92)',
+            background: '#000000',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(0, 0, 0, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
@@ -93,12 +93,12 @@ export default function DynamicIsland() {
             }}
             aria-label="Pyisland 首页"
           >
-            <img src="/island_w.svg" alt="" style={{ width: '26px', height: '26px', flexShrink: 0 }} />
+            <img src="/island_w.svg" alt="" style={{ width: '22px', height: '22px', flexShrink: 0 }} />
             <span
               style={{
                 fontSize: '14px',
                 fontWeight: '600',
-                color: '#1D1D1F',
+                color: '#fafafa',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -111,7 +111,7 @@ export default function DynamicIsland() {
             style={{
               width: '1px',
               height: '16px',
-              background: 'rgba(0, 0, 0, 0.08)',
+              background: 'rgba(255, 255, 255, 0.12)',
               margin: '0 4px',
               flexShrink: 0,
             }}
@@ -132,17 +132,17 @@ export default function DynamicIsland() {
                   borderRadius: '8px',
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#86868B',
+                  color: '#71717a',
                   textDecoration: 'none',
                   transition: 'color 0.2s ease, background 0.2s ease',
                   cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = '#1D1D1F';
-                  (e.target as HTMLElement).style.background = 'rgba(29, 29, 31, 0.06)';
+                  (e.target as HTMLElement).style.color = '#fafafa';
+                  (e.target as HTMLElement).style.background = 'rgba(255, 255, 255, 0.08)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = '#86868B';
+                  (e.target as HTMLElement).style.color = '#71717a';
                   (e.target as HTMLElement).style.background = 'transparent';
                 }}
               >
@@ -156,7 +156,7 @@ export default function DynamicIsland() {
             style={{
               width: '1px',
               height: '16px',
-              background: 'rgba(0, 0, 0, 0.08)',
+              background: 'rgba(255, 255, 255, 0.12)',
               margin: '0 4px',
               flexShrink: 0,
             }}
@@ -175,7 +175,7 @@ export default function DynamicIsland() {
               width: '28px',
               height: '28px',
               borderRadius: '8px',
-              color: '#86868B',
+              color: '#71717a',
               textDecoration: 'none',
               transition: 'color 0.2s ease, background 0.2s ease',
               cursor: 'pointer',
@@ -183,12 +183,12 @@ export default function DynamicIsland() {
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.color = '#1D1D1F';
-              el.style.background = 'rgba(29, 29, 31, 0.06)';
+              el.style.color = '#fafafa';
+              el.style.background = 'rgba(255, 255, 255, 0.08)';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.color = '#86868B';
+              el.style.color = '#71717a';
               el.style.background = 'transparent';
             }}
           >

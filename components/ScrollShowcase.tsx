@@ -352,7 +352,7 @@ export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
               onMouseLeave={() => threeRef.current?.setHover(false)}
             >
               <Github size={16} />
-              开发者文档
+              开发文档
             </a>
           </div>
         </div>
@@ -385,7 +385,7 @@ export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
             textTransform: 'uppercase',
           }}
         >
-          Scroll
+          向下滚动
         </span>
         <div
           style={{
