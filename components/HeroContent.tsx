@@ -20,8 +20,11 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
 
   // Slide-out: when transitioning hero→features, progress goes 0→1, hero should fade/slide out
   const slideOut = phase === 'transitioning' && activeView !== 'hero' ? progress : 0;
-  const opacity = isHero ? Math.max(0, 1 - slideOut) : 0;
-  const translateY = isHero ? -slideOut * 80 : 0;
+  // Slide-in: when transitioning features→hero, hero appears and slides up into place
+  const slideIn = isHero && phase === 'transitioning' ? progress : 1;
+
+  const opacity = isHero ? Math.max(0, 1 - slideOut) * slideIn : 0;
+  const translateY = isHero ? -slideOut * 80 + (1 - slideIn) * 50 : 0;
 
   return (
     <div
@@ -54,43 +57,49 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
         }}
       >
         <span
+          className={isHero ? stylesEffect.heroSubtitleAnim : ''}
           style={{
             fontSize: '12px',
             fontWeight: '600',
             color: ' #86868B',
             letterSpacing: '0.05em',
             textTransform: 'uppercase',
+            opacity: isHero ? undefined : 0,
           }}
         >
           Windows Dynamic Island
         </span>
 
         <h1
-          className={`${stylesTypography.textHero} ${stylesEffect.gradientText}`}
-          style={{ letterSpacing: '-0.02em' }}
+          className={`${stylesTypography.textHero} ${stylesEffect.gradientText} ${isHero ? stylesEffect.heroTitleAnim : ''}`}
+          style={{ letterSpacing: '-0.02em', opacity: isHero ? undefined : 0 }}
         >
           Pyisland
         </h1>
 
         <p
+          className={isHero ? stylesEffect.heroDescAnim : ''}
           style={{
             fontSize: 'clamp(15px, 2vw, 19px)',
             color: 'rgb(89, 89, 92)',
             lineHeight: 1.6,
             maxWidth: '440px',
-            fontWeight: '400',
+            fontWeight: 400,
+            opacity: isHero ? undefined : 0,
           }}
         >
           Windows 灵动岛新时代 — 打造现代控制中心
         </p>
 
         <div
+          className={isHero ? stylesEffect.heroButtonsAnim : ''}
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '12px',
             justifyContent: 'center',
             marginTop: '8px',
+            opacity: isHero ? undefined : 0,
           }}
         >
           <a

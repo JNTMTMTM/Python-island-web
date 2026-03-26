@@ -21,3 +21,68 @@
 .glowBorder {
   box-shadow: inset 0 0 20px rgba(29, 29, 31, 0.04), 0 0 20px rgba(29, 29, 31, 0.04);
 }
+
+/* ── Hero staggered entrance animations ──────────────────────────────────── */
+
+@keyframes heroSubtitleIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroTitleIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroDescIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroButtonsIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroSubtitleAnim {
+  animation: heroSubtitleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.heroTitleAnim {
+  animation: heroTitleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.08s;
+}
+
+.heroDescAnim {
+  animation: heroDescIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.18s;
+}
+
+.heroButtonsAnim {
+  animation: heroButtonsIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.3s;
+}
