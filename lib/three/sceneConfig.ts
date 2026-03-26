@@ -73,7 +73,7 @@ export const SCENE_CONFIG = {
       { x: Math.PI * 0.2, y: 0.7, z: Math.PI * 0.15 },
       { x: Math.PI * 0.2, y: 1.4, z: Math.PI * 0.15 },
     ],
-    orbitSpeeds: [0.18, 0.24, 0.30],
+    orbitSpeeds: [0.08, 0.14, 0.20],
     orbitZSpeeds: [0.05, 0.07, 0.09],
   },
 
