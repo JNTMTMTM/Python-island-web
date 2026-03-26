@@ -128,7 +128,7 @@ export default function DeveloperContent({ progress, activeView, phase }: Develo
         pointerEvents: isDevelopers ? 'auto' : 'none',
         transition: 'opacity 0.3s ease',
         zIndex: 4,
-        background: 'linear-gradient(160deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0d1b2a 100%)',
+        background: 'linear-gradient(160deg, #0a0a0a 0%, #1a1a1a 30%, #2d2d2d 55%, #1a1a1a 75%, #0a0a0a 100%)',
         overflow: 'hidden',
       }}
     >
