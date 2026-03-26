@@ -7,7 +7,6 @@ import type { ThreeSceneHandle } from './ThreeScene';
 import HeroContent from './HeroContent';
 import ScrollIndicator from './ScrollIndicator';
 import FeaturesContent from './FeaturesContent';
-import BackButton from './BackButton';
 import BranchesContent from './BranchesContent';
 
 const ThreeScene = dynamic(
@@ -258,9 +257,6 @@ export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
       />
 
       {/* Back button */}
-      {activeView === 'branches' && (
-        <BackButton onClick={() => handleTransition('up')} label="返回功能" />
-      )}
     </div>
   );
 }
