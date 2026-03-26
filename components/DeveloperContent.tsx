@@ -123,14 +123,107 @@ export default function DeveloperContent({ progress, activeView, phase }: Develo
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingBottom: 'clamp(24px, 5vh, 60px)',
+        justifyContent: 'center',
         opacity,
         pointerEvents: isDevelopers ? 'auto' : 'none',
         transition: 'opacity 0.3s ease',
         zIndex: 4,
+        background: 'linear-gradient(160deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0d1b2a 100%)',
+        overflow: 'hidden',
       }}
     >
+      {/* macOS menu bar */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '28px',
+          background: 'rgba(30, 30, 30, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 12px',
+          gap: '20px',
+          zIndex: 10,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        {/* Apple logo */}
+        <svg width="12" height="14" viewBox="0 0 12 14" fill="white" style={{ opacity: 0.9 }}>
+          <path d="M9.5 10.5c0-1.5 1.2-2.2 1.2-3.1 0-.5-.4-.8-1-.8-.7 0-1.4.4-1.8 1l-.5-.6c.5-.7 1.3-1.1 2.3-1.1 1.4 0 2.3.8 2.3 2.1 0 1.4-1 2.4-1 3.5 0 .7.4 1.4 1.1 1.4.6 0 1-.4 1-.4l.4.5c-.1.1-.5.5-1.4.5-1.1 0-1.9-.8-1.9-2l.3-.1zm-4.5-.4c-.5-.6-1.3-.9-2-.9-.8 0-1.5.3-2 .9l.5.6c.4-.4.9-.6 1.5-.6.6 0 1.2.2 1.6.7l.4-.7zM8 0c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4S5.8 0 8 0zm0 7c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" />
+        </svg>
+        {/* Active app */}
+        <span style={{ fontSize: '12px', fontWeight: '600', color: 'white', letterSpacing: '0.01em' }}>
+          Finder
+        </span>
+        {/* Menu items */}
+        {['文件', '编辑', '显示', '前往', '窗口', '帮助'].map(item => (
+          <span key={item} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.75)', letterSpacing: '0.01em' }}>
+            {item}
+          </span>
+        ))}
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+        {/* Status icons */}
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="rgba(255,255,255,0.85)">
+          <path d="M1 4C1 2.9 1.9 2 3 2h8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V4zm0-1L0 3v4l1-1h12l1 1V3l-1 0H1z" />
+          <path d="M4 5h6M4 7h3" stroke="rgba(255,255,255,0.7)" strokeWidth="1" fill="none" />
+        </svg>
+        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.01em' }}>▼</span>
+        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.85)' }}>100%</span>
+        {/* Clock */}
+        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.02em' }}>
+          下午 3:42
+        </span>
+      </div>
+
+      {/* Desktop icons */}
+      {[
+        { name: 'Pyisland', icon: '🟠', x: '18px' },
+        { name: 'VSCode', icon: '🔵', x: '18px' },
+        { name: 'Terminal', icon: '⚫', x: '18px' },
+      ].map((icon, i) => (
+        <div
+          key={icon.name}
+          style={{
+            position: 'absolute',
+            top: `calc(28px + ${i * 90}px + 20px)`,
+            left: icon.x,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            opacity: slideInFactor * 0.85,
+            transform: `translateY(${(1 - slideInFactor) * 10}px)`,
+            transition: `opacity 0.6s ease ${0.5 + i * 0.08}s, transform 0.6s ease ${0.5 + i * 0.08}s`,
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '14px',
+              background: icon.icon === '⚫'
+                ? 'linear-gradient(135deg, #1D1D1F, #3a3a3c)'
+                : icon.icon === '🔵'
+                ? 'linear-gradient(135deg, #007ACC, #0098FF)'
+                : 'linear-gradient(135deg, #FF9500, #FF6B00)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '28px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            }}
+          />
+          <span style={{ fontSize: '11px', color: 'white', textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+            {icon.name}
+          </span>
+        </div>
+      ))}
+
       {/* Screen / window container */}
       <div
         style={{
@@ -140,9 +233,10 @@ export default function DeveloperContent({ progress, activeView, phase }: Develo
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          transform: `translateY(${(1 - slideInFactor) * 60}px)`,
+          transform: `translateY(${(1 - slideInFactor) * 80}px)`,
           opacity: slideInFactor,
           transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease',
+          marginTop: '28px',
         }}
       >
         {/* Title above screen */}
@@ -317,6 +411,94 @@ export default function DeveloperContent({ progress, activeView, phase }: Develo
             </div>
           </div>
         </div>
+      </div>
+
+      {/* macOS Dock */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '8px',
+          left: '50%',
+          transform: `translateX(-50%) translateY(${(1 - slideInFactor) * 30}px)`,
+          opacity: slideInFactor,
+          transition: 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s, opacity 0.7s ease 0.4s',
+          background: 'rgba(255,255,255,0.18)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderRadius: '18px',
+          border: '1px solid rgba(255,255,255,0.25)',
+          padding: '4px 8px',
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '6px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          zIndex: 10,
+        }}
+      >
+        {[
+          { name: 'Finder', emoji: '🗂️', w: 52, h: 52 },
+          { name: 'Safari', emoji: '🧭', w: 52, h: 52 },
+          { name: 'VSCode', emoji: '💻', w: 52, h: 52 },
+          { name: 'Terminal', emoji: '⬛', w: 52, h: 52 },
+          { name: 'Pyisland', emoji: '🟠', w: 52, h: 52 },
+          { name: 'App Store', emoji: '🟦', w: 52, h: 52 },
+          { name: 'Settings', emoji: '⚙️', w: 52, h: 52 },
+        ].map((app) => (
+          <div
+            key={app.name}
+            title={app.name}
+            style={{
+              width: `${app.w}px`,
+              height: `${app.h}px`,
+              borderRadius: '12px',
+              background: app.emoji === '⬛'
+                ? 'linear-gradient(135deg, #1D1D1F, #3a3a3c)'
+                : app.emoji === '🟠'
+                ? 'linear-gradient(135deg, #FF9500, #FF6B00)'
+                : app.emoji === '🟦'
+                ? 'linear-gradient(135deg, #007AFF, #0051D4)'
+                : app.emoji === '💻'
+                ? 'linear-gradient(135deg, #007ACC, #0098FF)'
+                : 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              cursor: 'pointer',
+              border: '1px solid rgba(255,255,255,0.15)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+              transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px) scale(1.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; }}
+          />
+        ))}
+        {/* Separator */}
+        <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.2)', margin: '0 2px' }} />
+        {[
+          { name: 'Trash', emoji: '🗑️', w: 52, h: 52 },
+        ].map((app) => (
+          <div
+            key={app.name}
+            title={app.name}
+            style={{
+              width: `${app.w}px`,
+              height: `${app.h}px`,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              cursor: 'pointer',
+              border: '1px solid rgba(255,255,255,0.15)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+              transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px) scale(1.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; }}
+          />
+        ))}
       </div>
     </div>
   );
