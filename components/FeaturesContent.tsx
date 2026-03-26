@@ -152,103 +152,98 @@ export default function FeaturesContent({ progress, activeView, phase }: Feature
       style={{
         position: 'absolute',
         inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         opacity,
         pointerEvents: isFeatures ? 'auto' : 'none',
         transition: 'opacity 0.3s ease',
         zIndex: 4,
       }}
     >
+      {/* Left column — 3 cards stacked */}
       <div
         style={{
-          width: '100%',
-          maxWidth: '1200px',
-          padding: '0 clamp(20px, 5vw, 60px)',
-          display: 'grid',
-          gridTemplateColumns: '1fr 220px 1fr',
-          gap: '0px',
-          alignItems: 'center',
+          position: 'absolute',
+          left: 'clamp(20px, 10vw, 120px)',
+          top: '50%',
+          transform: `translateY(-50%) translateX(${(1 - slideInFactor) * -40}px)`,
+          opacity: slideInFactor,
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+          width: '260px',
         }}
       >
-        {/* Left column — 3 cards stacked */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            transform: `translateX(${(1 - slideInFactor) * -40}px)`,
-            opacity: slideInFactor,
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
-            paddingRight: '130px',
-          }}
-        >
-          {features.slice(0, 3).map((feature, i) => (
-            <FeatureCard
-              key={feature.title}
-              {...feature}
-              slideIn={slideInFactor}
-              delay={i}
-            />
-          ))}
-        </div>
+        {features.slice(0, 3).map((feature, i) => (
+          <FeatureCard
+            key={feature.title}
+            {...feature}
+            slideIn={slideInFactor}
+            delay={i}
+          />
+        ))}
+      </div>
 
-        {/* Center — title */}
-        <div
+      {/* Center — title, always dead-center of the viewport */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
+          transform: `translate(-50%, -50%) translateY(${(1 - slideInFactor) * 30}px)`,
+          opacity: slideInFactor,
+          transition: 'transform 0.7s ease, opacity 0.7s ease',
+          pointerEvents: 'none',
+        }}
+      >
+        <span
+          className={stylesEffect.gradientText}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '12px',
-            transform: `translateY(${(1 - slideInFactor) * 30}px)`,
-            opacity: slideInFactor,
-            transition: 'transform 0.7s ease, opacity 0.7s ease',
+            fontSize: '28px',
+            fontWeight: '600',
+            letterSpacing: '-0.02em',
           }}
         >
-          <span
-            className={stylesEffect.gradientText}
-            style={{
-              fontSize: '28px',
-              fontWeight: '600',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            核心功能
-          </span>
-          <p
-            style={{
-              fontSize: '13px',
-              color: '#86868B',
-              textAlign: 'center',
-              lineHeight: 1.6,
-            }}
-          >
-            每一个细节都为<br />Windows 用户精心打造
-          </p>
-        </div>
+          核心功能
+        </span>
+        <p
+          style={{
+            fontSize: '13px',
+            color: '#86868B',
+            textAlign: 'center',
+            lineHeight: 1.6,
+          }}
+        >
+          每一个细节都为<br />Windows 用户精心打造
+        </p>
+      </div>
 
-        {/* Right column — 3 cards stacked */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            transform: `translateX(${(1 - slideInFactor) * 40}px)`,
-            opacity: slideInFactor,
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
-            paddingLeft: '130px',
-          }}
-        >
-          {features.slice(3, 6).map((feature, i) => (
-            <FeatureCard
-              key={feature.title}
-              {...feature}
-              slideIn={slideInFactor}
-              delay={i}
-            />
-          ))}
-        </div>
+      {/* Right column — 3 cards stacked */}
+      <div
+        style={{
+          position: 'absolute',
+          right: 'clamp(20px, 10vw, 120px)',
+          top: '50%',
+          transform: `translateY(-50%) translateX(${(1 - slideInFactor) * 40}px)`,
+          opacity: slideInFactor,
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+          width: '260px',
+        }}
+      >
+        {features.slice(3, 6).map((feature, i) => (
+          <FeatureCard
+            key={feature.title}
+            {...feature}
+            slideIn={slideInFactor}
+            delay={i}
+          />
+        ))}
       </div>
     </div>
   );
