@@ -5,13 +5,24 @@ import stylesButton from '@/styles/button.module.css';
 import stylesTypography from '@/styles/typography.module.css';
 import stylesEffect from '@/styles/effect.module.css';
 
+type ViewState = 'hero' | 'features' | 'branches';
+type Phase = 'idle' | 'transitioning';
+
 interface HeroContentProps {
   threeRef: { current: { setHover: (val: boolean) => void } | null };
-  transitionProgress: number;
-  view: 'hero' | 'features';
+  progress: number;
+  activeView: ViewState;
+  phase: Phase;
 }
 
-export default function HeroContent({ threeRef, transitionProgress, view }: HeroContentProps) {
+export default function HeroContent({ threeRef, progress, activeView, phase }: HeroContentProps) {
+  const isHero = activeView === 'hero';
+
+  // Slide-out: when transitioning hero→features, progress goes 0→1, hero should fade/slide out
+  const slideOut = phase === 'transitioning' && activeView !== 'hero' ? progress : 0;
+  const opacity = isHero ? Math.max(0, 1 - slideOut) : 0;
+  const translateY = isHero ? -slideOut * 80 : 0;
+
   return (
     <div
       id="hero"
@@ -21,10 +32,10 @@ export default function HeroContent({ threeRef, transitionProgress, view }: Hero
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: view === 'hero' ? 1 : 0,
-        transform: `translateY(${Math.min(transitionProgress * 2, 1) * -80}px)`,
-        transition: 'opacity 0.2s ease, transform 0.2s ease',
-        pointerEvents: view === 'hero' ? 'auto' : 'none',
+        opacity,
+        transform: `translateY(${translateY}px)`,
+        transition: 'opacity 0.15s ease, transform 0.15s ease',
+        pointerEvents: isHero ? 'auto' : 'none',
         zIndex: 3,
       }}
     >

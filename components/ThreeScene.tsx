@@ -11,14 +11,21 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
   const transitionRef = useRef(0);
+  // Separate ref for the raw multi-view target (0 / 0.5 / 1) — must be a ref so useImperativeHandle can access it
+  const viewTargetRef = useRef(0);
   const hueRef = useRef(0);
 
   useImperativeHandle(ref, () => ({
     setHover: (active: boolean) => {
       hoverRef.current = active;
     },
+    /** Set the eased progress value during animation (0→1 within a transition) */
     setTransition: (progress: number) => {
       transitionRef.current = progress;
+    },
+    /** Set the raw multi-view target: 0=hero, 0.5=features, 1=branches */
+    setViewTarget: (target: number) => {
+      viewTargetRef.current = target;
     },
     hueRef,
   }));
@@ -55,7 +62,7 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
 
     // Create animation state
     const animationState: AnimationState = createAnimationState();
-    const transitionState: TransitionState = { current: 0 };
+    const transitionState: TransitionState = { current: 0, multiViewTarget: 0 };
 
     // Bundle scene elements
     const elements: SceneElements = {
@@ -70,7 +77,7 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
     };
 
     // Bundle refs
-    const refs: SceneRefs = { mouse, hoverRef, transitionRef, transitionState, hueRef };
+    const refs: SceneRefs = { mouse, hoverRef, transitionRef, viewTargetRef, transitionState, hueRef };
 
     // Start animation loop
     const cleanup = createAnimationLoop(renderer, scene, camera, elements, refs, animationState);

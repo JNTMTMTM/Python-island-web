@@ -19,6 +19,8 @@ export interface AnimationState {
 
 export interface TransitionState {
   current: number;
+  /** 0 = hero, 0.5 = features, 1 = branches — cumulative smoothed value */
+  multiViewTarget: number;
 }
 
 export interface SceneElements {
@@ -36,6 +38,8 @@ export interface SceneRefs {
   mouse: { x: number; y: number };
   hoverRef: React.MutableRefObject<boolean>;
   transitionRef: React.MutableRefObject<number>;
+  /** Raw multi-view target: 0=hero, 0.5=features, 1=branches */
+  viewTargetRef: React.MutableRefObject<number>;
   transitionState: TransitionState;
   hueRef: React.MutableRefObject<number>;
 }
@@ -71,12 +75,17 @@ export function createAnimationLoop(
       SCENE_CONFIG.rainbow.smoothing
     );
 
-    // Update transition state from ref
+    // Update transition state from ref (smooth lerp for 0→1 transition)
     refs.transitionState.current += (refs.transitionRef.current - refs.transitionState.current) * 0.08;
     const transition = refs.transitionState.current;
 
+    // Multi-view: smooth multiViewTarget toward the raw viewTarget (0 / 0.5 / 1)
+    refs.transitionState.multiViewTarget +=
+      (refs.viewTargetRef.current - refs.transitionState.multiViewTarget) * 0.08;
+    const multiViewTarget = refs.transitionState.multiViewTarget;
+
     // Animate island group
-    animateIslandGroup(elements, refs, state, t, transition);
+    animateIslandGroup(elements, refs, state, t, transition, multiViewTarget);
 
     // Animate glow effects
     const baseHue = getBaseHue(t);
@@ -117,15 +126,16 @@ function animateIslandGroup(
   refs: SceneRefs,
   state: AnimationState,
   time: number,
-  transition: number
+  transition: number,
+  multiViewTarget: number
 ): void {
   const { islandGroup, pill, glow, outerGlowLayers } = elements;
-  const { mouse, hoverRef } = refs;
+  const { mouse, hoverRef, transitionRef } = refs;
   const { animation } = SCENE_CONFIG;
 
   // Reduce floating during transition
   const floatReduction = lerp(1, 0.3, transition);
-  
+
   // Floating motion
   islandGroup.position.y = Math.sin(time * animation.floatSpeed) * animation.floatAmplitudeY * floatReduction;
   islandGroup.position.x = Math.cos(time * animation.floatSpeed * 0.625) * animation.floatAmplitudeX * floatReduction;
@@ -137,19 +147,34 @@ function animateIslandGroup(
   islandGroup.rotation.x += (mouseTiltX - islandGroup.rotation.x) * animation.mouseTiltSmoothing;
   islandGroup.rotation.y += (mouseTiltY - islandGroup.rotation.y) * animation.mouseTiltSmoothing;
 
-  // Smooth rotation from horizontal (PI/2) to vertical (0) during transition
-  const initialRotationZ = SCENE_CONFIG.islandGroup.rotationZ;
-  const targetRotationZ = lerp(initialRotationZ, 0, transition);
+  // ── Multi-view rotation (derived from transitionRef — 0→1 eased per transition)
+  // Hero→Features: transitionRef 0→0.5, rotation PI/2→0
+  // Features→Branches: transitionRef 0→1, rotation 0→-PI/2
+  const refValue = transitionRef.current;
+  let targetRotationZ: number;
+  if (refValue <= 0.5) {
+    const t = refValue * 2;
+    targetRotationZ = lerp(Math.PI / 2, 0, 1 - Math.pow(1 - t, 3));
+  } else {
+    const t = (refValue - 0.5) * 2;
+    targetRotationZ = lerp(0, -Math.PI / 2, 1 - Math.pow(1 - t, 3));
+  }
   islandGroup.rotation.z += (targetRotationZ - islandGroup.rotation.z) * 0.08;
 
-  // Hover scale
-  const targetScale = hoverRef.current ? animation.hoverScaleTarget : 1;
-  state.hoverState.current = lerp(state.hoverState.current, targetScale, animation.hoverScaleSmoothing);
+  // ── Scale (derived from multiViewTarget — slow smooth tracking 0→0.5→1)
+  const hoverScale = hoverRef.current ? animation.hoverScaleTarget : 1;
+  state.hoverState.current = lerp(state.hoverState.current, hoverScale, animation.hoverScaleSmoothing);
   const breathScale = 1 + Math.sin(time * animation.breathSpeed) * animation.breathAmount;
   const baseScale = breathScale * state.hoverState.current;
 
-  // Transition scale: pill shrinks when going to features, expands when going to hero
-  const transitionScale = lerp(0.64, 1, 1 - transition);
+  let transitionScale: number;
+  if (multiViewTarget <= 0.5) {
+    const t = multiViewTarget * 2;
+    transitionScale = lerp(1, 0.64, 1 - Math.pow(1 - t, 3));
+  } else {
+    const t = (multiViewTarget - 0.5) * 2;
+    transitionScale = lerp(0.64, 0.55, 1 - Math.pow(1 - t, 3));
+  }
 
   pill.scale.setScalar(baseScale * transitionScale);
   glow.scale.setScalar(state.hoverState.current * transitionScale);

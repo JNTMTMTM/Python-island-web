@@ -11,6 +11,9 @@ import {
 import stylesGlass from '@/styles/glass.module.css';
 import stylesEffect from '@/styles/effect.module.css';
 
+type ViewState = 'hero' | 'features' | 'branches';
+type Phase = 'idle' | 'transitioning';
+
 const features = [
   {
     icon: MousePointerClick,
@@ -50,14 +53,11 @@ const features = [
   },
 ];
 
-interface FeatureCardProps {
+function FeatureCard({ icon: Icon, title, description }: {
   icon: typeof MousePointerClick;
   title: string;
   description: string;
-  index: number;
-}
-
-function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
+}) {
   return (
     <div
       className={`${stylesGlass.glassCard} ${stylesGlass.glassCardHover}`}
@@ -124,12 +124,20 @@ function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
 }
 
 interface FeaturesContentProps {
-  transitionProgress: number;
+  progress: number;
+  activeView: ViewState;
+  phase: Phase;
 }
 
-export default function FeaturesContent({ transitionProgress }: FeaturesContentProps) {
-  const contentOpacity = Math.min(1, Math.max(0, (transitionProgress - 0.65) * 3.5));
-  const slideInFactor = Math.min(1, Math.max(0, (transitionProgress - 0.7) * 3.5));
+export default function FeaturesContent({ progress, activeView, phase }: FeaturesContentProps) {
+  const isFeatures = activeView === 'features';
+  const isTransitioning = phase === 'transitioning';
+
+  // Slide-in factor: during features→branches transition (progress 0→1), features should fade/slide out
+  const slideOut = isTransitioning && activeView === 'branches' ? progress : 0;
+
+  const opacity = isFeatures ? Math.max(0, 1 - slideOut) : 0;
+  const slideInFactor = isFeatures ? 1 : 0;
 
   return (
     <div
@@ -139,9 +147,9 @@ export default function FeaturesContent({ transitionProgress }: FeaturesContentP
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: contentOpacity,
-        pointerEvents: transitionProgress > 0.88 ? 'auto' : 'none',
-        transition: 'opacity 0.5s ease 0.1s',
+        opacity,
+        pointerEvents: isFeatures ? 'auto' : 'none',
+        transition: 'opacity 0.3s ease',
         zIndex: 4,
       }}
     >
@@ -166,12 +174,12 @@ export default function FeaturesContent({ transitionProgress }: FeaturesContentP
             transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s',
           }}
         >
-          <FeatureCard {...features[0]} index={0} />
-          <FeatureCard {...features[1]} index={1} />
-          <FeatureCard {...features[2]} index={2} />
+          <FeatureCard {...features[0]} />
+          <FeatureCard {...features[1]} />
+          <FeatureCard {...features[2]} />
         </div>
 
-        {/* Center - Island placeholder */}
+        {/* Center */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <div
             style={{
@@ -182,7 +190,7 @@ export default function FeaturesContent({ transitionProgress }: FeaturesContentP
               alignItems: 'center',
               justifyContent: 'center',
               transform: `translateY(${(1 - slideInFactor) * 100}px)`,
-              opacity: contentOpacity,
+              opacity,
               transition: 'transform 0.8s ease, opacity 0.8s ease',
             }}
           >
@@ -221,9 +229,9 @@ export default function FeaturesContent({ transitionProgress }: FeaturesContentP
             transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s',
           }}
         >
-          <FeatureCard {...features[3]} index={3} />
-          <FeatureCard {...features[4]} index={4} />
-          <FeatureCard {...features[5]} index={5} />
+          <FeatureCard {...features[3]} />
+          <FeatureCard {...features[4]} />
+          <FeatureCard {...features[5]} />
         </div>
       </div>
     </div>

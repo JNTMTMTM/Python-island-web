@@ -1,10 +1,12 @@
 'use client';
 
+type ViewState = 'hero' | 'features' | 'branches';
+
 interface ScrollIndicatorProps {
-  transitionProgress: number;
+  activeView: ViewState;
 }
 
-export default function ScrollIndicator({ transitionProgress }: ScrollIndicatorProps) {
+export default function ScrollIndicator({ activeView }: ScrollIndicatorProps) {
   return (
     <div
       aria-hidden="true"
@@ -12,15 +14,15 @@ export default function ScrollIndicator({ transitionProgress }: ScrollIndicatorP
         position: 'absolute',
         bottom: '40px',
         left: '50%',
-        transform: `translateX(-50%) translateY(${Math.min(transitionProgress * 2, 1) * 100}px)`,
+        transform: 'translateX(-50%)',
         zIndex: 3,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: '8px',
-        opacity: Math.max(0, 1 - transitionProgress * 4),
-        transition: 'opacity 0.4s ease, transform 0.6s ease',
+        opacity: activeView === 'hero' ? 1 : 0,
         pointerEvents: 'none',
+        transition: 'opacity 0.4s ease',
       }}
     >
       <span

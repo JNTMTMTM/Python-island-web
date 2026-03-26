@@ -8,132 +8,170 @@ import HeroContent from './HeroContent';
 import ScrollIndicator from './ScrollIndicator';
 import FeaturesContent from './FeaturesContent';
 import BackButton from './BackButton';
+import BranchesContent from './BranchesContent';
 
 const ThreeScene = dynamic(
   () => import('./ThreeScene').then(m => m.ThreeSceneInner),
   { ssr: false }
 ) as ComponentType<{ ref?: React.Ref<ThreeSceneHandle> }>;
 
-type ViewState = 'hero' | 'features';
+type ViewState = 'hero' | 'features' | 'branches';
+
+const VIEW_TARGET: Record<ViewState, number> = {
+  hero: 0,
+  features: 0.5,
+  branches: 1,
+};
+
+const DURATION = 800;
+
+/**
+ * Phase tracks where we are in the transition lifecycle:
+ * - idle + view = fully settled in that view
+ * - transitioning = animating toward targetView, content should show targetView
+ */
+type Phase = 'idle' | 'transitioning';
+interface PhaseState {
+  phase: Phase;
+  targetView: ViewState;
+}
 
 interface ScrollShowcaseProps {
   children?: ReactNode;
 }
 
 export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
+  /** Stable view after animation completes */
   const [view, setView] = useState<ViewState>('hero');
-  const [transitionProgress, setTransitionProgress] = useState(0);
+  /** Phase + target during transition */
+  const [phaseState, setPhaseState] = useState<PhaseState>({ phase: 'idle', targetView: 'hero' });
+  /** Local progress 0→1 for CSS animations */
+  const [progress, setProgress] = useState(1);
+
   const threeRef = useRef<ThreeSceneHandle>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isTransitioning = useRef(false);
-  const wheelAccumulator = useRef(0);
+
+  /** Computed: active view during or after animation */
+  const activeView = phaseState.phase === 'idle' ? view : phaseState.targetView;
 
   const handleTransition = useCallback((direction: 'down' | 'up') => {
     if (isTransitioning.current) return;
 
-    if (direction === 'down' && view === 'hero') {
-      isTransitioning.current = true;
-      setView('features');
+    const nextViewMap: Record<ViewState, ViewState | null> = {
+      hero: direction === 'down' ? 'features' : null,
+      features: direction === 'down' ? 'branches' : 'hero',
+      branches: direction === 'up' ? 'features' : null,
+    };
 
-      let start: number | null = null;
-      const duration = 800;
+    const nextView = nextViewMap[view];
+    if (!nextView) return;
 
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
+    isTransitioning.current = true;
+    const fromTarget = VIEW_TARGET[view];
+    const toTarget = VIEW_TARGET[nextView];
 
-        setTransitionProgress(eased);
-        threeRef.current?.setTransition(eased);
+    // Immediately signal Three.js the destination
+    threeRef.current?.setViewTarget(toTarget);
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          isTransitioning.current = false;
-        }
-      };
-      requestAnimationFrame(animate);
+    // Begin transition — content should now show targetView
+    setPhaseState({ phase: 'transitioning', targetView: nextView });
+    setProgress(0);
 
-    } else if (direction === 'up' && view === 'features') {
-      isTransitioning.current = true;
+    let start: number | null = null;
 
-      let start: number | null = null;
-      const duration = 800;
+    const animate = (timestamp: number) => {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const t = Math.min(elapsed / DURATION, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
 
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
+      // easedProgress drives rotation speed — same easing curve as React animation
+      const easedProgress = fromTarget + (toTarget - fromTarget) * eased;
+      threeRef.current?.setTransition(easedProgress);
+      setProgress(eased);
 
-        setTransitionProgress(1 - eased);
-        threeRef.current?.setTransition(1 - eased);
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          setView('hero');
-          isTransitioning.current = false;
-        }
-      };
-      requestAnimationFrame(animate);
-    }
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Animation complete — settle into the new view
+        setView(nextView);
+        setPhaseState({ phase: 'idle', targetView: nextView });
+        setProgress(1);
+        threeRef.current?.setTransition(toTarget);
+        isTransitioning.current = false;
+      }
+    };
+    requestAnimationFrame(animate);
   }, [view]);
 
-  // Sync URL hash with current view
+  // URL hash sync
   useEffect(() => {
-    const hash = view === 'features' ? '#features' : '#hero';
+    const hash = `#${activeView}`;
     if (window.location.hash !== hash) {
       history.replaceState(null, '', window.location.pathname + hash);
       window.dispatchEvent(new CustomEvent('pyisland:navigate', { detail: { hash } }));
     }
-  }, [view]);
+  }, [activeView]);
 
-  // React to navigation events (e.g. clicking nav links in DynamicIsland)
+  // Navigation events from DynamicIsland nav
   useEffect(() => {
     const handleNavigate = (e: Event) => {
       const hash = (e as CustomEvent<{ hash: string }>).detail.hash;
-      if (hash === '#features' && view !== 'features') {
-        handleTransition('down');
-      } else if (hash === '#hero' && view !== 'hero') {
-        handleTransition('up');
+      const target = hash.replace('#', '') as ViewState;
+
+      if (target === activeView || !VIEW_TARGET[target]) return;
+
+      if (VIEW_TARGET[target] > VIEW_TARGET[activeView]) {
+        // Need to go down — may require multiple steps
+        if (activeView === 'hero' && target === 'branches') {
+          threeRef.current?.setViewTarget(0.5);
+          handleTransition('down');
+          setTimeout(() => handleTransition('down'), DURATION + 60);
+        } else {
+          handleTransition('down');
+        }
+      } else {
+        // Need to go up — may require multiple steps
+        if (activeView === 'branches' && target === 'hero') {
+          handleTransition('up');
+          setTimeout(() => handleTransition('up'), DURATION + 60);
+        } else {
+          handleTransition('up');
+        }
       }
     };
 
     window.addEventListener('pyisland:navigate', handleNavigate);
     return () => window.removeEventListener('pyisland:navigate', handleNavigate);
-  }, [view, handleTransition]);
+  }, [activeView, handleTransition]);
 
+  // Wheel scroll
   useEffect(() => {
+    let accumulator = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
+      accumulator += e.deltaY;
 
-      wheelAccumulator.current += e.deltaY;
-
-      if (Math.abs(wheelAccumulator.current) > 80) {
-        if (wheelAccumulator.current > 0) {
-          handleTransition('down');
-        } else {
-          handleTransition('up');
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (Math.abs(accumulator) > 80) {
+          if (accumulator > 0) handleTransition('down');
+          else handleTransition('up');
         }
-        wheelAccumulator.current = 0;
-      }
+        accumulator = 0;
+      }, 50);
     };
 
     const container = containerRef.current;
-    if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
-    }
-
+    if (container) container.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
-      if (container) {
-        container.removeEventListener('wheel', handleWheel);
-      }
+      if (container) container.removeEventListener('wheel', handleWheel);
+      clearTimeout(timer);
     };
   }, [handleTransition]);
-
-  const isFeaturesView = transitionProgress > 0;
 
   return (
     <div
@@ -146,7 +184,7 @@ export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
         userSelect: 'none',
       }}
     >
-      {/* Layer 1: Subtle gradient background */}
+      {/* Background gradient */}
       <div
         aria-hidden="true"
         style={{
@@ -158,28 +196,40 @@ export default function ScrollShowcase({ children }: ScrollShowcaseProps) {
         }}
       />
 
-      {/* Layer 2: 3D Canvas - full screen background */}
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 2,
-        }}
-      >
+      {/* Three.js Canvas */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 2 }}>
         <ThreeScene ref={threeRef} />
       </div>
 
-      {/* Layer 3: Hero Content */}
-      <HeroContent threeRef={threeRef} transitionProgress={transitionProgress} view={view} />
+      {/* Hero */}
+      <HeroContent
+        threeRef={threeRef}
+        progress={progress}
+        activeView={activeView}
+        phase={phaseState.phase}
+      />
 
-      {/* Scroll Indicator */}
-      <ScrollIndicator transitionProgress={transitionProgress} />
+      {/* Scroll indicator — only in hero */}
+      <ScrollIndicator activeView={activeView} />
 
-      {/* Features Content */}
-      <FeaturesContent transitionProgress={transitionProgress} />
+      {/* Features */}
+      <FeaturesContent
+        progress={progress}
+        activeView={activeView}
+        phase={phaseState.phase}
+      />
 
-      {/* Back to top indicator in features view */}
-      {isFeaturesView && <BackButton onClick={() => handleTransition('up')} />}
+      {/* Branches */}
+      <BranchesContent
+        progress={progress}
+        activeView={activeView}
+        phase={phaseState.phase}
+      />
+
+      {/* Back button */}
+      {activeView === 'branches' && (
+        <BackButton onClick={() => handleTransition('up')} label="返回功能" />
+      )}
     </div>
   );
 }
