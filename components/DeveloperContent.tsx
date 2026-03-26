@@ -180,50 +180,6 @@ export default function DeveloperContent({ progress, activeView, phase }: Develo
         </span>
       </div>
 
-      {/* Desktop icons */}
-      {[
-        { name: 'Pyisland', icon: '🟠', x: '18px' },
-        { name: 'VSCode', icon: '🔵', x: '18px' },
-        { name: 'Terminal', icon: '⚫', x: '18px' },
-      ].map((icon, i) => (
-        <div
-          key={icon.name}
-          style={{
-            position: 'absolute',
-            top: `calc(28px + ${i * 90}px + 20px)`,
-            left: icon.x,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            opacity: slideInFactor * 0.85,
-            transform: `translateY(${(1 - slideInFactor) * 10}px)`,
-            transition: `opacity 0.6s ease ${0.5 + i * 0.08}s, transform 0.6s ease ${0.5 + i * 0.08}s`,
-          }}
-        >
-          <div
-            style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '14px',
-              background: icon.icon === '⚫'
-                ? 'linear-gradient(135deg, #1D1D1F, #3a3a3c)'
-                : icon.icon === '🔵'
-                ? 'linear-gradient(135deg, #007ACC, #0098FF)'
-                : 'linear-gradient(135deg, #FF9500, #FF6B00)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '28px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            }}
-          />
-          <span style={{ fontSize: '11px', color: 'white', textAlign: 'center', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
-            {icon.name}
-          </span>
-        </div>
-      ))}
-
       {/* Screen / window container */}
       <div
         style={{
