@@ -53,11 +53,16 @@ const features = [
   },
 ];
 
-function FeatureCard({ icon: Icon, title, description }: {
+function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
   icon: typeof MousePointerClick;
   title: string;
   description: string;
+  slideIn: number;
+  delay: number;
 }) {
+  const cardOpacity = slideIn;
+  const transitionDelay = `${delay * 80}ms`;
+
   return (
     <div
       className={`${stylesGlass.glassCard} ${stylesGlass.glassCardHover}`}
@@ -65,6 +70,9 @@ function FeatureCard({ icon: Icon, title, description }: {
         padding: '24px',
         position: 'relative',
         overflow: 'hidden',
+        opacity: cardOpacity,
+        transform: `translateY(${(1 - slideIn) * 20}px)`,
+        transition: `opacity 1s ease ${transitionDelay}, transform 0.7s ease ${transitionDelay}, background 0.3s ease, border-color 0.3s ease`,
       }}
     >
       <div
@@ -171,12 +179,13 @@ export default function FeaturesContent({ progress, activeView, phase }: Feature
             flexDirection: 'column',
             gap: '16px',
             transform: `translateX(${(1 - slideInFactor) * -60}px)`,
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.6s ease',
+            opacity: slideInFactor,
           }}
         >
-          <FeatureCard {...features[0]} />
-          <FeatureCard {...features[1]} />
-          <FeatureCard {...features[2]} />
+          <FeatureCard {...features[0]} slideIn={slideInFactor} delay={0} />
+          <FeatureCard {...features[1]} slideIn={slideInFactor} delay={1} />
+          <FeatureCard {...features[2]} slideIn={slideInFactor} delay={2} />
         </div>
 
         {/* Center */}
@@ -226,12 +235,13 @@ export default function FeaturesContent({ progress, activeView, phase }: Feature
             flexDirection: 'column',
             gap: '16px',
             transform: `translateX(${(1 - slideInFactor) * 60}px)`,
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.6s ease',
+            opacity: slideInFactor,
           }}
         >
-          <FeatureCard {...features[3]} />
-          <FeatureCard {...features[4]} />
-          <FeatureCard {...features[5]} />
+          <FeatureCard {...features[3]} slideIn={slideInFactor} delay={0} />
+          <FeatureCard {...features[4]} slideIn={slideInFactor} delay={1} />
+          <FeatureCard {...features[5]} slideIn={slideInFactor} delay={2} />
         </div>
       </div>
     </div>
