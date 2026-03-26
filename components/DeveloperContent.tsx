@@ -108,6 +108,23 @@ const developers: Developer[] = [
       { label: '自动化' },
     ],
   },
+  {
+    id: 'JNTMTMTM',
+    name: '鸡哥',
+    nameEn: 'JNTMTMTM',
+    dockLabel: '鸡哥',
+    email: 'JNTMTMTM@nailong.com',
+    bio: '南京最后的全栈工程师',
+    traits: [
+      { icon: '/', label: '保持神秘_0', desc: '404 NOT FOUND' },
+      { icon: '/', label: '保持神秘_1', desc: '404 NOT FOUND' },
+      { icon: '/', label: '保持神秘_2', desc: '404 NOT FOUND' },
+      { icon: '/', label: '保持神秘_3', desc: '404 NOT FOUND' },
+    ],
+    skills: [
+      { label: '404 NOT FOUND' }
+    ],
+  },
 ];
 
 const dockAvatars = developers.map(dev => {
@@ -117,6 +134,7 @@ const dockAvatars = developers.map(dev => {
     silenthim: '/avatar/silenthim.jpg',
     GeminiMortal: '/avatar/GeminiMortal.jpg',
     cXp1r: '/avatar/cxp1r.png',
+    JNTMTMTM: '/avatar/JNTMTMTM.jpg',
   };
   return {
     ...dev,
