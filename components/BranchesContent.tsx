@@ -26,9 +26,9 @@ const branches = [
     description: '追求高仿真 iOS 灵动岛外观，支持录屏、媒体控制和歌词显示。',
     tech: ['Python', 'PySide6', '毛玻璃'],
     badge: '高颜值',
-    badgeColor: '#a855f7',
+    badgeColor: '#1D1D1F',
     href: 'https://github.com/Python-island/Python-island/tree/pyisland-wanku',
-    accent: '#a855f7',
+    accent: '#86868B',
     position: 'top-right' as const,
   },
   {
@@ -38,9 +38,9 @@ const branches = [
     description: '采用 Tauri 2 + Rust 重写，性能更强，安装包体积更小。',
     tech: ['Rust', 'Tauri 2', 'WebView'],
     badge: '高性能',
-    badgeColor: '#2563eb',
+    badgeColor: '#1D1D1F',
     href: 'https://github.com/Python-island/Python-island/tree/tauri-island',
-    accent: '#2563eb',
+    accent: '#86868B',
     position: 'bottom-left' as const,
   },
   {
@@ -50,9 +50,9 @@ const branches = [
     description: '纯 PyQt5 分支，基于事件总线架构，提供轻量高效的灵动岛体验。',
     tech: ['Python 3.10+', 'PyQt5', 'asyncio'],
     badge: '轻量版',
-    badgeColor: '#16a34a',
+    badgeColor: '#1D1D1F',
     href: 'https://github.com/Python-island/Python-island/tree/pyislandQT',
-    accent: '#16a34a',
+    accent: '#86868B',
     position: 'bottom-right' as const,
   },
 ];
@@ -231,7 +231,7 @@ export default function BranchesContent({ progress, activeView, phase }: Branche
           style={{
             position: 'absolute',
             left: '50%',
-            transform: `translateX(calc(-150% - clamp(160px, 22vw, 260px))) translateY(0%) translateX(${(1 - slideInFactor) * -50}px)`,
+            transform: `translateX(calc(-130% - clamp(160px, 22vw, 260px))) translateY(0%) translateX(${(1 - slideInFactor) * -50}px)`,
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
@@ -248,7 +248,7 @@ export default function BranchesContent({ progress, activeView, phase }: Branche
           style={{
             position: 'absolute',
             right: '50%',
-            transform: `translateX(calc(150% + clamp(160px, 22vw, 260px))) translateY(0%) translateX(${(1 - slideInFactor) * 50}px)`,
+            transform: `translateX(calc(130% + clamp(160px, 22vw, 260px))) translateY(0%) translateX(${(1 - slideInFactor) * 50}px)`,
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
