@@ -178,16 +178,13 @@ function animateIslandGroup(
     transitionScale = lerp(1, 0.64, 1 - Math.pow(1 - t, 3));
   } else {
     const t = (refValue - 0.5) * 2;
-    transitionScale = lerp(0.64, 0.26, 1 - Math.pow(1 - t, 3));
+    transitionScale = lerp(0.64, 0.195, 1 - Math.pow(1 - t, 3));
   }
 
-  // Extra shrink when fully at branches view
-  const branchesShrink = refValue >= 0.95 ? lerp(1, 0.75, (refValue - 0.95) / 0.05) : 1;
-
-  pill.scale.setScalar(baseScale * transitionScale * branchesShrink);
-  glow.scale.setScalar(state.hoverState.current * breathScale * transitionScale * branchesShrink);
+  pill.scale.setScalar(baseScale * transitionScale);
+  glow.scale.setScalar(state.hoverState.current * breathScale * transitionScale);
   outerGlowLayers.forEach(layer => {
-    layer.mesh.scale.setScalar(state.hoverState.current * breathScale * transitionScale * branchesShrink);
+    layer.mesh.scale.setScalar(state.hoverState.current * breathScale * transitionScale);
   });
 }
 
