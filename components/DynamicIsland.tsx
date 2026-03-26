@@ -9,6 +9,7 @@ export default function DynamicIsland() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activePage, setActivePage] = useState('');
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
+  const branchesBtnRef = useRef<HTMLButtonElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   const navigate = useCallback((hash: string) => {
@@ -38,12 +39,20 @@ export default function DynamicIsland() {
 
   useLayoutEffect(() => {
     const updateIndicator = () => {
-      if (featuresBtnRef.current) {
-        const btn = featuresBtnRef.current;
+      let btn: HTMLButtonElement | null = null;
+      let active = false;
+      if (activePage === '#features' && featuresBtnRef.current) {
+        btn = featuresBtnRef.current;
+        active = true;
+      } else if (activePage === '#branches' && branchesBtnRef.current) {
+        btn = branchesBtnRef.current;
+        active = true;
+      }
+      if (btn) {
         setIndicatorStyle({
           left: btn.offsetLeft + 6,
           width: btn.offsetWidth - 12,
-          opacity: activePage === '#features' ? 1 : 0,
+          opacity: active ? 1 : 0,
         });
       }
     };
@@ -185,7 +194,25 @@ export default function DynamicIsland() {
             >
               功能
             </button>
-            {/* Active indicator underline */}
+            <button
+              ref={branchesBtnRef}
+              onClick={() => navigate('#branches')}
+              style={{
+                padding: '4px 10px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '500',
+                color: activePage === '#branches' ? '#ffffff' : '#71717a',
+                transition: 'color 0.2s ease',
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+              }}
+              className="diNavBtn"
+            >
+              分支
+            </button>
+            {/* Active indicator underline — lives between both buttons so it can animate between them */}
             <div
               style={{
                 position: 'absolute',
