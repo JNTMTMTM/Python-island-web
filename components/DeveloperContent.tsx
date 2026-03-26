@@ -116,17 +116,17 @@ const dockAvatars = developers.map(dev => {
     GeminiMortal: 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
     cXp1r: 'linear-gradient(135deg, #EF4444, #B91C1C)',
   };
-  const letters: Record<string, string> = {
-    StarWindv: 'S',
-    Code: 'C',
-    silenthim: 'S',
-    GeminiMortal: 'G',
-    cXp1r: 'C',
+  const avatarMap: Record<string, string> = {
+    StarWindv: '/avatar/StarWindv.png',
+    Code: '/avatar/code.png',
+    silenthim: '/avatar/silenthim.jpg',
+    GeminiMortal: '/avatar/GeminiMortal.jpg',
+    cXp1r: '/avatar/cxp1r.png',
   };
   return {
     ...dev,
     gradient: colors[dev.id] ?? '#86868B',
-    letter: letters[dev.id] ?? dev.name[0],
+    avatar: avatarMap[dev.id] ?? '',
   };
 });
 
@@ -315,19 +315,17 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                   height: '72px',
                   borderRadius: '50%',
                   background: dockDev.gradient,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '28px',
-                  fontWeight: '700',
-                  color: 'white',
-                  boxShadow: `0 4px 16px ${dev.accent}40`,
                   flexShrink: 0,
+                  overflow: 'hidden',
+                  boxShadow: `0 4px 16px ${dev.accent}40`,
                   border: '3px solid rgba(255,255,255,0.9)',
-                  fontFamily: 'ui-monospace, monospace',
                 }}
               >
-                {dockDev.letter}
+                <img
+                  src={dockDev.avatar}
+                  alt={dev.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
               {/* Name & email */}
               <div>
@@ -503,13 +501,7 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
               width: '52px',
               height: '52px',
               borderRadius: '12px',
-              background: dock.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px',
-              fontWeight: '700',
-              color: 'white',
+              overflow: 'hidden',
               cursor: 'pointer',
               border: i === currentDev ? '2px solid white' : '2px solid transparent',
               boxShadow: i === currentDev
@@ -517,7 +509,6 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                 : '0 2px 8px rgba(0,0,0,0.2)',
               transform: i === currentDev ? 'scale(1.15) translateY(-4px)' : 'scale(1)',
               transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border 0.2s ease, box-shadow 0.2s ease',
-              fontFamily: 'ui-monospace, monospace',
             }}
             onMouseEnter={e => {
               if (i !== currentDev) e.currentTarget.style.transform = 'translateY(-8px) scale(1.1)';
@@ -526,7 +517,11 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
               if (i !== currentDev) e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            {dock.letter}
+            <img
+              src={dock.avatar}
+              alt={dock.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           </div>
         ))}
       </div>
