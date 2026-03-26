@@ -79,13 +79,8 @@ export function createAnimationLoop(
     refs.transitionState.current += (refs.transitionRef.current - refs.transitionState.current) * 0.08;
     const transition = refs.transitionState.current;
 
-    // Multi-view: smooth multiViewTarget toward the raw viewTarget (0 / 0.5 / 1)
-    refs.transitionState.multiViewTarget +=
-      (refs.viewTargetRef.current - refs.transitionState.multiViewTarget) * 0.08;
-    const multiViewTarget = refs.transitionState.multiViewTarget;
-
     // Animate island group
-    animateIslandGroup(elements, refs, state, t, transition, multiViewTarget);
+    animateIslandGroup(elements, refs, state, t, transition);
 
     // Animate glow effects
     const baseHue = getBaseHue(t);
@@ -126,8 +121,7 @@ function animateIslandGroup(
   refs: SceneRefs,
   state: AnimationState,
   time: number,
-  transition: number,
-  multiViewTarget: number
+  transition: number
 ): void {
   const { islandGroup, pill, glow, outerGlowLayers } = elements;
   const { mouse, hoverRef, transitionRef } = refs;
@@ -147,10 +141,16 @@ function animateIslandGroup(
   islandGroup.rotation.x += (mouseTiltX - islandGroup.rotation.x) * animation.mouseTiltSmoothing;
   islandGroup.rotation.y += (mouseTiltY - islandGroup.rotation.y) * animation.mouseTiltSmoothing;
 
-  // ── Multi-view rotation (derived from transitionRef — 0→1 eased per transition)
-  // Hero→Features: transitionRef 0→0.5, rotation PI/2→0
-  // Features→Branches: transitionRef 0→1, rotation 0→-PI/2
+  // ── Both rotation and scale use transitionRef (React eased value 0→1).
+  // This ensures rotation and scale animate at exactly the same speed,
+  // consistent with the original hero→features animation.
+  //
+  // Ref value ranges:
+  //   Hero→Features: transitionRef 0→0.5,  rotation PI/2→0, scale 1→0.64
+  //   Features→Branches: transitionRef 0.5→1, rotation 0→-PI/2, scale 0.64→0.55
   const refValue = transitionRef.current;
+
+  // Rotation
   let targetRotationZ: number;
   if (refValue <= 0.5) {
     const t = refValue * 2;
@@ -161,18 +161,18 @@ function animateIslandGroup(
   }
   islandGroup.rotation.z += (targetRotationZ - islandGroup.rotation.z) * 0.08;
 
-  // ── Scale (derived from multiViewTarget — slow smooth tracking 0→0.5→1)
+  // Scale
   const hoverScale = hoverRef.current ? animation.hoverScaleTarget : 1;
   state.hoverState.current = lerp(state.hoverState.current, hoverScale, animation.hoverScaleSmoothing);
   const breathScale = 1 + Math.sin(time * animation.breathSpeed) * animation.breathAmount;
   const baseScale = breathScale * state.hoverState.current;
 
   let transitionScale: number;
-  if (multiViewTarget <= 0.5) {
-    const t = multiViewTarget * 2;
+  if (refValue <= 0.5) {
+    const t = refValue * 2;
     transitionScale = lerp(1, 0.64, 1 - Math.pow(1 - t, 3));
   } else {
-    const t = (multiViewTarget - 0.5) * 2;
+    const t = (refValue - 0.5) * 2;
     transitionScale = lerp(0.64, 0.55, 1 - Math.pow(1 - t, 3));
   }
 
