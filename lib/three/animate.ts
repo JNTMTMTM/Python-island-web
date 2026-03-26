@@ -32,6 +32,7 @@ export interface SceneElements {
   coreMat: THREE.MeshBasicMaterial;
   particles: THREE.Points;
   particleMat: THREE.PointsMaterial;
+  raycaster: THREE.Raycaster;
 }
 
 export interface SceneRefs {
@@ -57,7 +58,8 @@ export function createAnimationLoop(
 ): () => void {
   let animId = 0;
   let isRunning = true;
-  
+  const ndc = new THREE.Vector2();
+
   // Initial camera position
   const initialCameraZ = SCENE_CONFIG.camera.positionZ;
 
@@ -65,6 +67,12 @@ export function createAnimationLoop(
     if (!isRunning) return;
     animId = requestAnimationFrame(animate);
     const t = performance.now() * 0.001;
+
+    // ── Raycasting: detect hover over island pill ─────────────────────────────
+    ndc.set(refs.mouse.x, refs.mouse.y);
+    elements.raycaster.setFromCamera(ndc, camera);
+    const hits = elements.raycaster.intersectObject(elements.pill, false);
+    refs.hoverRef.current = hits.length > 0;
 
     // Update state
     const isHovered = refs.hoverRef.current;
@@ -177,9 +185,9 @@ function animateIslandGroup(
   const branchesShrink = refValue >= 0.95 ? lerp(1, 0.75, (refValue - 0.95) / 0.05) : 1;
 
   pill.scale.setScalar(baseScale * transitionScale * branchesShrink);
-  glow.scale.setScalar(state.hoverState.current * transitionScale * branchesShrink);
+  glow.scale.setScalar(state.hoverState.current * breathScale * transitionScale * branchesShrink);
   outerGlowLayers.forEach(layer => {
-    layer.mesh.scale.setScalar(state.hoverState.current * transitionScale * branchesShrink);
+    layer.mesh.scale.setScalar(state.hoverState.current * breathScale * transitionScale * branchesShrink);
   });
 }
 

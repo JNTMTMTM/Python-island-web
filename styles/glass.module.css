@@ -98,7 +98,7 @@
 .branchCard:hover {
   background: rgba(255, 255, 255, 0.98);
   border-color: rgba(29, 29, 31, 0.14);
-  transform: translateY(-4px) scale(1.025);
+  transform: translateY(-4px);
   border-radius: 18px;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.12),

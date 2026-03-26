@@ -56,6 +56,9 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
     // Create particles
     const { points: particles, mat: particleMat } = createParticles(scene);
 
+    // Raycaster for hover detection
+    const raycaster = new THREE.Raycaster();
+
     // Create mouse tracker
     const { mouse, onMouseMove } = createMouseTracker();
     window.addEventListener('mousemove', onMouseMove);
@@ -74,6 +77,7 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
       coreMat,
       particles,
       particleMat,
+      raycaster,
     };
 
     // Bundle refs

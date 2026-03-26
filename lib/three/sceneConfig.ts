@@ -119,6 +119,8 @@ export const SCENE_CONFIG = {
     mouseTiltSmoothing: 0.05,
     hoverScaleTarget: 0.92,
     hoverScaleSmoothing: 0.06,
+    hoverStretchXZ: 0.0,
+    hoverStretchY: 0.0,
     breathSpeed: 1.2,
     breathAmount: 0.015,
   },
