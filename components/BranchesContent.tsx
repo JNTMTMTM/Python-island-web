@@ -68,19 +68,21 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
       style={{ display: 'block', textDecoration: 'none', cursor: 'pointer' }}
     >
       <div
-        className={`${stylesGlass.glassCard} ${stylesGlass.glassCardHover}`}
+        className={stylesGlass.branchCard}
         style={{
           padding: '18px 20px',
           width: '230px',
+          borderRadius: 'var(--radius-lg)',
           transform: `translateX(${(1 - slideIn) * (isLeft ? -30 : 30)}px)`,
           opacity: slideIn,
-          transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease, background 0.3s ease, border-color 0.3s ease',
+          transition: `transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.35s ease`,
           borderColor: 'rgba(0, 0, 0, 0.06)',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
         <div
+          className="branch-card-topline"
           style={{
             position: 'absolute',
             top: 0,
@@ -88,9 +90,12 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             right: 0,
             height: '2px',
             background: `linear-gradient(90deg, transparent, ${branch.accent}40, transparent)`,
+            opacity: 0.5,
+            transition: 'opacity 0.3s ease',
           }}
         />
         <div
+          className="branch-card-badge"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -99,6 +104,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             background: `${branch.accent}15`,
             border: `1px solid ${branch.accent}30`,
             marginBottom: '10px',
+            transition: 'background 0.3s ease, border-color 0.3s ease',
           }}
         >
           <span style={{ fontSize: '10px', fontWeight: '600', color: branch.badgeColor, letterSpacing: '0.05em' }}>
@@ -106,6 +112,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
           </span>
         </div>
         <h4
+          className="branch-card-title"
           style={{
             fontSize: '14px',
             fontWeight: '700',
@@ -113,9 +120,13 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             marginBottom: '4px',
             letterSpacing: '-0.01em',
             fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+            transition: 'color 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           {branch.name}
+          <span className="branch-card-arrow" style={{ fontSize: '12px', color: '#86868B' }}>→</span>
         </h4>
         <p style={{ fontSize: '11px', color: branch.accent, fontWeight: '500', marginBottom: '8px', letterSpacing: '0.02em' }}>
           {branch.tagline}
@@ -141,6 +152,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
           ))}
         </div>
         <div
+          className="branch-card-link-icon"
           style={{
             position: 'absolute',
             bottom: '16px',
@@ -150,8 +162,6 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0.4,
-            transition: 'opacity 0.3s ease',
           }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" strokeWidth="2">

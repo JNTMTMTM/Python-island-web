@@ -39,11 +39,11 @@
 
 .glassCardHover:hover {
   background: rgba(255, 255, 255, 1);
-  border-color: rgba(29, 29, 31, 0.12);
-  transform: translateY(-2px);
+  border-color: rgba(29, 29, 31, 0.14);
+  transform: translateY(-3px) scale(1.02);
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.06),
-    0 1px 4px rgba(0, 0, 0, 0.04);
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Card icon hover effect */
@@ -58,4 +58,90 @@
 .glassCardHover:hover .card-accent-line {
   opacity: 1;
   width: '120px';
+}
+
+/* ── Branch Card Hover ──────────────────────────────────────────────────── */
+
+.branchCard {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-lg);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.branchCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(29, 29, 31, 0.05) 50%,
+    transparent 60%
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.branchCard:hover::before {
+  left: 100%;
+}
+
+.branchCard:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(29, 29, 31, 0.14);
+  transform: translateY(-4px) scale(1.025);
+  border-radius: 18px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.branchCard:hover .branch-card-topline {
+  opacity: 1 !important;
+}
+
+.branchCard:hover .branch-card-badge {
+  background: rgba(29, 29, 31, 0.10) !important;
+  border-color: rgba(29, 29, 31, 0.20) !important;
+}
+
+.branchCard:hover .branch-card-badge span {
+  color: #1D1D1F !important;
+}
+
+.branchCard:hover .branch-card-title {
+  color: #000000 !important;
+}
+
+.branchCard:hover .branch-card-arrow {
+  opacity: 1 !important;
+  transform: translateX(3px);
+}
+
+/* Card arrow indicator */
+.branch-card-arrow {
+  display: inline-block;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  margin-left: 4px;
+}
+
+/* Bottom-right link icon */
+.branch-card-link-icon {
+  opacity: 0.4;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.branchCard:hover .branch-card-link-icon {
+  opacity: 0.7;
+  transform: translate(2px, -2px);
 }
