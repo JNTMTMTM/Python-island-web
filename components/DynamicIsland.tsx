@@ -14,7 +14,6 @@ export default function DynamicIsland() {
   const [activePage, setActivePage] = useState<NavPage>('#hero');
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
-  const heroBtnRef = useRef<HTMLButtonElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   const navigate = useCallback((hash: string) => {
@@ -76,13 +75,7 @@ export default function DynamicIsland() {
 
   useLayoutEffect(() => {
     const updateIndicator = () => {
-      if (activePage === '#hero' && heroBtnRef.current) {
-        setIndicatorStyle({
-          left: heroBtnRef.current.offsetLeft + 6,
-          width: heroBtnRef.current.offsetWidth - 12,
-          opacity: 1,
-        });
-      } else if (activePage === '#features' && featuresBtnRef.current) {
+      if (activePage === '#features' && featuresBtnRef.current) {
         setIndicatorStyle({
           left: featuresBtnRef.current.offsetLeft + 6,
           width: featuresBtnRef.current.offsetWidth - 12,
@@ -174,7 +167,6 @@ export default function DynamicIsland() {
         >
           {/* Left logo */}
           <button
-            ref={heroBtnRef}
             onClick={() => navigate('#hero')}
             style={{
               display: 'flex',
