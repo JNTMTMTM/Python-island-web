@@ -353,45 +353,44 @@ export default function DynamicIsland() {
             </a>
           </div>
 
-          {/* Title section — slides in when not on hero */}
-          {pageInfo && (
-            <div
+          {/* Title section — always rendered so CSS transitions actually animate */}
+          <div
+            style={{
+              maxHeight: showTitle ? '80px' : '0px',
+              overflow: 'hidden',
+              opacity: showTitle ? 1 : 0,
+              transition: 'max-height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              borderTop: showTitle ? '1px solid rgba(255,255,255,0.06)' : 'none',
+              padding: showTitle ? '10px 16px 12px' : '0',
+              transition: 'max-height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease, border-top 0.35s ease, padding 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            <span
               style={{
-                padding: showTitle ? '10px 16px 12px' : '0 16px',
-                maxHeight: showTitle ? '80px' : '0px',
-                overflow: 'hidden',
-                opacity: showTitle ? 1 : 0,
-                transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                borderTop: '1px solid rgba(255,255,255,0.06)',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#ffffff',
+                letterSpacing: '-0.01em',
+                lineHeight: 1,
               }}
             >
-              <span
-                style={{
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: '#ffffff',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1,
-                }}
-              >
-                {pageInfo.title}
-              </span>
-              <span
-                style={{
-                  fontSize: '10px',
-                  color: '#71717a',
-                  letterSpacing: '0.01em',
-                  lineHeight: 1,
-                }}
-              >
-                {pageInfo.subtitle}
-              </span>
-            </div>
-          )}
+              {pageInfo?.title ?? ''}
+            </span>
+            <span
+              style={{
+                fontSize: '10px',
+                color: '#71717a',
+                letterSpacing: '0.01em',
+                lineHeight: 1,
+              }}
+            >
+              {pageInfo?.subtitle ?? ''}
+            </span>
+          </div>
         </div>
       </div>
     </div>
