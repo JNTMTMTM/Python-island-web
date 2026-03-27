@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: '立即下载 | Pyisland',
@@ -10,7 +9,6 @@ export default function Download() {
   return (
     <main>
       <div style={{ minHeight: '100vh' }} />
-      <Footer />
     </main>
   );
 }
