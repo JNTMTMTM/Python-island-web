@@ -153,14 +153,14 @@ interface DeveloperContentProps {
   phase: Phase;
   currentDev: number;
   onSwitchDev: (index: number) => void;
-  onBackToBranches: () => void;
+  onBackToDownloads: () => void;
 }
 
-export default function DeveloperContent({ progress, activeView, phase, currentDev, onSwitchDev, onBackToBranches }: DeveloperContentProps) {
+export default function DeveloperContent({ progress, activeView, phase, currentDev, onSwitchDev, onBackToDownloads }: DeveloperContentProps) {
   const isDevelopers = activeView === 'developers';
   const isTransitioning = phase === 'transitioning';
 
-  const slideOut = isTransitioning && activeView === 'branches' ? progress : 0;
+  const slideOut = isTransitioning && (activeView === 'branches' || activeView === 'downloads') ? progress : 0;
   const opacity = isDevelopers ? Math.max(0, 1 - slideOut) : 0;
   const slideInFactor = isDevelopers ? 1 : 0;
 
@@ -213,17 +213,17 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
           onSwitchDev(currentDev + 1);
         }
       } else {
-        // Scroll up: go to prev developer, or back to branches at first
+        // Scroll up: go to prev developer, or back to downloads at first
         if (currentDev > 0) {
           onSwitchDev(currentDev - 1);
         } else {
-          onBackToBranches();
+          onBackToDownloads();
         }
       }
     };
     window.addEventListener('wheel', handleWheel, { passive: false });
     return () => window.removeEventListener('wheel', handleWheel);
-  }, [isDevelopers, phase, currentDev, onSwitchDev, onBackToBranches, developers.length]);
+  }, [isDevelopers, phase, currentDev, onSwitchDev, onBackToDownloads, developers.length]);
 
   // ── Dock magnify effect ──────────────────────────────────────────────────
   const dockContainerRef = useRef<HTMLDivElement>(null);
@@ -782,7 +782,7 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
               letterSpacing: '0.01em',
             }}
           >
-            分支界面
+            下载界面
             <div
               style={{
                 position: 'absolute',
@@ -800,8 +800,8 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
 
           {/* Icon button */}
           <div
-            title="返回分支界面"
-            onClick={onBackToBranches}
+            title="返回下载界面"
+            onClick={onBackToDownloads}
             style={{
               width: '52px',
               height: '52px',

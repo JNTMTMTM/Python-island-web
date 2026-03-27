@@ -9,6 +9,7 @@ import HeroContent from './HeroContent';
 import ScrollIndicator from './ScrollIndicator';
 import FeaturesContent from './FeaturesContent';
 import BranchesContent from './BranchesContent';
+import DownloadsContent from './DownloadsContent';
 import DeveloperContent from './DeveloperContent';
 
 const ThreeScene = dynamic(
@@ -19,7 +20,8 @@ const ThreeScene = dynamic(
 const VIEW_TARGET: Record<ViewState, number> = {
   hero: 0,
   features: 0.33,
-  branches: 0.67,
+  branches: 0.55,
+  downloads: 0.78,
   developers: 1,
 };
 
@@ -59,8 +61,9 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     const nextViewMap: Record<ViewState, ViewState | null> = {
       hero: direction === 'down' ? 'features' : null,
       features: direction === 'down' ? 'branches' : 'hero',
-      branches: direction === 'down' ? 'developers' : 'features',
-      developers: direction === 'up' ? 'branches' : null,
+      branches: direction === 'down' ? 'downloads' : 'features',
+      downloads: direction === 'down' ? 'developers' : 'branches',
+      developers: direction === 'up' ? 'downloads' : null,
     };
 
     const nextView = nextViewMap[view];
@@ -203,8 +206,8 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     let timer: ReturnType<typeof setTimeout>;
 
     const handleWheel = (e: WheelEvent) => {
-      // Don't intercept wheel when in developers view — DeveloperContent handles it
-      if (view === 'developers') return;
+      // Don't intercept wheel when in developers or downloads view — they handle their own wheel
+      if (view === 'developers' || view === 'downloads') return;
       e.preventDefault();
       accumulator += e.deltaY;
 
@@ -279,6 +282,15 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         phase={phaseState.phase}
       />
 
+      {/* Downloads */}
+      <DownloadsContent
+        progress={progress}
+        activeView={activeView}
+        phase={phaseState.phase}
+        onBackToBranches={() => navigateTo('branches')}
+        onForwardToDevelopers={() => navigateTo('developers')}
+      />
+
       {/* Back button */}
 
       {/* Developers */}
@@ -288,7 +300,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         phase={phaseState.phase}
         currentDev={currentDev}
         onSwitchDev={switchToDeveloper}
-        onBackToBranches={() => navigateTo('branches')}
+        onBackToDownloads={() => navigateTo('downloads')}
       />
     </div>
   );

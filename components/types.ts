@@ -1,4 +1,4 @@
-export type ViewState = 'hero' | 'features' | 'branches' | 'developers';
+export type ViewState = 'hero' | 'features' | 'branches' | 'downloads' | 'developers';
 export type Phase = 'idle' | 'transitioning';
 
 export interface Developer {

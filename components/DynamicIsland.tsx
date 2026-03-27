@@ -3,15 +3,16 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { Github } from 'lucide-react';
 
-type NavPage = '#hero' | '#features' | '#branches' | '#developers';
+type NavPage = '#hero' | '#features' | '#branches' | '#downloads' | '#developers';
 
-const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#developers'];
+const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#downloads', '#developers'];
 
 export default function DynamicIsland() {
   const [isHovered, setIsHovered] = useState(false);
   const [activePage, setActivePage] = useState<NavPage>('#hero');
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
+  const downloadsBtnRef = useRef<HTMLButtonElement>(null);
   const developersBtnRef = useRef<HTMLButtonElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
@@ -86,6 +87,12 @@ export default function DynamicIsland() {
           width: branchesBtnRef.current.offsetWidth - 12,
           opacity: 1,
         });
+      } else if (activePage === '#downloads' && downloadsBtnRef.current) {
+        setIndicatorStyle({
+          left: downloadsBtnRef.current.offsetLeft + 6,
+          width: downloadsBtnRef.current.offsetWidth - 12,
+          opacity: 1,
+        });
       } else if (activePage === '#developers' && developersBtnRef.current) {
         setIndicatorStyle({
           left: developersBtnRef.current.offsetLeft + 6,
@@ -105,7 +112,7 @@ export default function DynamicIsland() {
         position: 'fixed',
         top: '24px',
         left: '50%',
-        transform: `translateX(-50%) translateY(${activePage === '#developers' ? '30px' : '0'})`,
+        transform: `translateX(-50%) translateY(${activePage === '#developers' || activePage === '#downloads' ? '30px' : '0'})`,
         zIndex: 200,
         display: 'flex',
         alignItems: 'center',
@@ -235,6 +242,24 @@ export default function DynamicIsland() {
               className="diNavBtn"
             >
               分支
+            </button>
+            <button
+              ref={downloadsBtnRef}
+              onClick={() => navigate('#downloads')}
+              style={{
+                padding: '4px 10px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '500',
+                color: activePage === '#downloads' ? '#ffffff' : '#71717a',
+                transition: 'color 0.2s ease',
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+              }}
+              className="diNavBtn"
+            >
+              下载
             </button>
             <button
               ref={developersBtnRef}
