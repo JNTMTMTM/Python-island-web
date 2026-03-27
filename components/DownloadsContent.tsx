@@ -181,14 +181,14 @@ export default function DownloadsContent({
   const slideInFactor = isDownloads ? 1 : 0;
 
   const [selectedBranch, setSelectedBranch] = useState(0);
-  const [copiedIndex, setCopiedIndex] = useState<{ branch: number; cmd: number } | null>(null);
+  const [copiedLine, setCopiedLine] = useState<number | null>(null);
 
   const currentData = downloadData[selectedBranch];
 
-  const copyCommand = (cmd: string, branchIdx: number, cmdIdx: number) => {
+  const copyCommand = (cmd: string, lineNum: number) => {
     navigator.clipboard.writeText(cmd).then(() => {
-      setCopiedIndex({ branch: branchIdx, cmd: cmdIdx });
-      setTimeout(() => setCopiedIndex(null), 1500);
+      setCopiedLine(lineNum);
+      setTimeout(() => setCopiedLine(null), 1500);
     });
   };
 
@@ -448,55 +448,60 @@ export default function DownloadsContent({
                     overflow: 'hidden',
                   }}
                 >
-                  {method.commands.map((cmd, cmdIdx) => (
-                    <div
-                      key={cmdIdx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '8px 14px',
-                        borderBottom: cmdIdx < method.commands.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
-                      }}
-                    >
-                      <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontFamily: 'ui-monospace, monospace', width: '24px', flexShrink: 0 }}>
-                        {(methodIdx + 1) + cmdIdx}
-                      </span>
-                      <code
+                  {method.commands.map((cmd, cmdIdx) => {
+                    const globalLine = currentData.installMethods
+                      .slice(0, methodIdx)
+                      .reduce((sum, m) => sum + m.commands.length, 0) + cmdIdx + 1;
+                    return (
+                      <div
+                        key={cmdIdx}
                         style={{
-                          flex: 1,
-                          fontSize: '12px',
-                          color: cmd.startsWith('#') ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)',
-                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                          letterSpacing: '0.02em',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '8px 14px',
+                          borderBottom: cmdIdx < method.commands.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
                         }}
                       >
-                        {cmd}
-                      </code>
-                      {!cmd.startsWith('#') && (
-                        <button
-                          onClick={() => copyCommand(cmd, selectedBranch, cmdIdx)}
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontFamily: 'ui-monospace, monospace', width: '24px', flexShrink: 0 }}>
+                          {globalLine}
+                        </span>
+                        <code
                           style={{
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            fontSize: '10px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            border: 'none',
-                            background: copiedIndex?.branch === selectedBranch && copiedIndex?.cmd === cmdIdx
-                              ? 'rgba(40, 200, 64, 0.2)'
-                              : 'rgba(255,255,255,0.08)',
-                            color: copiedIndex?.branch === selectedBranch && copiedIndex?.cmd === cmdIdx
-                              ? '#28C840'
-                              : 'rgba(255,255,255,0.5)',
-                            transition: 'all 0.2s ease',
-                            fontFamily: 'ui-monospace, monospace',
+                            flex: 1,
+                            fontSize: '12px',
+                            color: cmd.startsWith('#') ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)',
+                            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                            letterSpacing: '0.02em',
                           }}
                         >
-                          {copiedIndex?.branch === selectedBranch && copiedIndex?.cmd === cmdIdx ? 'copied' : 'copy'}
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                          {cmd}
+                        </code>
+                        {!cmd.startsWith('#') && (
+                          <button
+                            onClick={() => copyCommand(cmd, globalLine)}
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              fontSize: '10px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              border: 'none',
+                              background: copiedLine === globalLine
+                                ? 'rgba(40, 200, 64, 0.2)'
+                                : 'rgba(255,255,255,0.08)',
+                              color: copiedLine === globalLine
+                                ? '#28C840'
+                                : 'rgba(255,255,255,0.5)',
+                              transition: 'all 0.2s ease',
+                              fontFamily: 'ui-monospace, monospace',
+                            }}
+                          >
+                            {copiedLine === globalLine ? 'copied' : 'copy'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
