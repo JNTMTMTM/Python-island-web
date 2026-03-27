@@ -163,6 +163,22 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
   const dev = developers[currentDev];
   const dockDev = dockAvatars[currentDev];
 
+  // Card switch animation state — tracks what's currently displayed
+  const [displayDev, setDisplayDev] = useState(currentDev);
+  const [cardVisible, setCardVisible] = useState(true);
+
+  // Animate card content on developer switch
+  useEffect(() => {
+    if (currentDev !== displayDev) {
+      setCardVisible(false);
+      const t1 = setTimeout(() => {
+        setDisplayDev(currentDev);
+        setCardVisible(true);
+      }, 280);
+      return () => clearTimeout(t1);
+    }
+  }, [currentDev, displayDev]);
+
   const getMacTime = () => {
     const now = new Date();
     const h = now.getHours();
@@ -374,23 +390,22 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
 
           {/* Profile content */}
           <div
+            key={`card-content-${displayDev}`}
             style={{
               padding: 'clamp(28px, 5vw, 56px)',
               display: 'flex',
               flexDirection: 'column',
               gap: '28px',
+              opacity: cardVisible ? 1 : 0,
+              transform: cardVisible ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.97)',
+              transition: cardVisible
+                ? 'opacity 0.38s cubic-bezier(0, 0, 0.2, 1), transform 0.38s cubic-bezier(0, 0, 0.2, 1)'
+                : 'opacity 0.28s cubic-bezier(0.4, 0, 1, 1), transform 0.28s cubic-bezier(0.4, 0, 1, 1)',
             }}
           >
             {/* Avatar + name + email */}
             <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                transform: `translateY(${(1 - slideInFactor) * 16}px)`,
-                opacity: slideInFactor,
-                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease',
-              }}
+              className={stylesEffect.cardAvatarSlide}
             >
               {/* Avatar */}
               <div
@@ -405,8 +420,8 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                 }}
               >
                 <img
-                  src={dockDev.avatar}
-                  alt={dev.name}
+                  src={dockAvatars[displayDev].avatar}
+                  alt={developers[displayDev].name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
@@ -421,15 +436,15 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                     letterSpacing: '-0.01em',
                   }}
                 >
-                  {dev.name}
+                  {developers[displayDev].name}
                 </h2>
-                {dev.nameEn !== dev.name && (
+                {developers[displayDev].nameEn !== developers[displayDev].name && (
                   <p style={{ fontSize: '13px', color: '#86868B', margin: '0 0 6px', fontWeight: '500' }}>
-                    {dev.nameEn}
+                    {developers[displayDev].nameEn}
                   </p>
                 )}
                 <a
-                  href={`mailto:${dev.email}`}
+                  href={`mailto:${developers[displayDev].email}`}
                   style={{
                     fontSize: '12px',
                     color: '#555',
@@ -441,23 +456,17 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                   onMouseEnter={e => (e.currentTarget.style.opacity = '0.6')}
                   onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                 >
-                  {dev.email}
+                  {developers[displayDev].email}
                 </a>
               </div>
             </div>
 
             {/* Traits grid */}
             <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                gap: '12px',
-                transform: `translateY(${(1 - slideInFactor) * 16}px)`,
-                opacity: slideInFactor,
-                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.08s, opacity 0.6s ease 0.08s',
-              }}
+              className={stylesEffect.cardTraitsSlide}
+              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}
             >
-              {dev.traits.map((trait, i) => (
+              {developers[displayDev].traits.map((trait, i) => (
                 <div
                   key={trait.label}
                   style={{
@@ -498,15 +507,13 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
 
             {/* Bio quote */}
             <div
+              className={stylesEffect.cardBioSlide}
               style={{
                 padding: '16px 20px',
                 background: 'rgba(0, 0, 0, 0.025)',
                 borderRadius: '10px',
                 border: '1px solid rgba(0, 0, 0, 0.04)',
                 borderLeft: '3px solid #555',
-                transform: `translateY(${(1 - slideInFactor) * 16}px)`,
-                opacity: slideInFactor,
-                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.16s, opacity 0.6s ease 0.16s',
               }}
             >
               <p
@@ -518,18 +525,14 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                   fontStyle: 'italic',
                 }}
               >
-                {dev.bio}
+                {developers[displayDev].bio}
               </p>
             </div>
 
             {/* Skills */}
-            {dev.skills.length > 0 && (
+            {developers[displayDev].skills.length > 0 && (
               <div
-                style={{
-                  transform: `translateY(${(1 - slideInFactor) * 16}px)`,
-                  opacity: slideInFactor,
-                  transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.24s, opacity 0.6s ease 0.24s',
-                }}
+                className={stylesEffect.cardSkillsSlide}
               >
                 <div
                   style={{
@@ -544,7 +547,7 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
                   技术栈
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {dev.skills.map(skill => (
+                  {developers[displayDev].skills.map(skill => (
                     <span
                       key={skill.label}
                       style={{
