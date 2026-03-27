@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import stylesEffect from '@/styles/effect.module.css';
 import type { ViewState, Phase } from './types';
 
@@ -189,41 +189,56 @@ export default function DownloadsContent({
 
   const currentData = downloadData[displayBranch];
 
-  // Measure actual rendered height via ResizeObserver
+  // Measure intrinsic content height (scrollHeight is unaffected by maxHeight)
+  const measureHeight = useCallback(() => {
+    const el = contentMeasuredRef.current;
+    if (!el) return;
+    // Temporarily reveal so scrollHeight is accurate
+    el.style.overflow = 'visible';
+    el.style.visibility = 'hidden';
+    const h = el.scrollHeight;
+    el.style.overflow = '';
+    el.style.visibility = '';
+    return h;
+  }, []);
+
+  // Measure via ResizeObserver on content change
   useEffect(() => {
     const el = contentMeasuredRef.current;
     if (!el) return;
-    const measure = () => {
-      const h = el.getBoundingClientRect().height;
+    const ro = new ResizeObserver(() => {
+      const h = measureHeight();
       if (h > 0) setTerminalContentHeight(h);
-    };
-    const ro = new ResizeObserver(measure);
+    });
     ro.observe(el);
-    measure();
     return () => ro.disconnect();
-  }, [displayBranch]);
+  }, [displayBranch, measureHeight]);
 
-  // Two-phase switch: fade out → switch branch → measure DOM height → fade in
+  // On entering downloads view: measure immediately after paint
+  useEffect(() => {
+    if (!isDownloads) return;
+    requestAnimationFrame(() => {
+      const h = measureHeight();
+      if (h > 0) setTerminalContentHeight(h);
+    });
+  }, [isDownloads, measureHeight]);
+
+  // Two-phase switch: fade out → switch branch → measure new height → fade in
   useEffect(() => {
     if (selectedBranch === displayBranch) return;
     setBranchVisible(false);
     const t1 = setTimeout(() => {
       setDisplayBranch(selectedBranch);
       const t2 = setTimeout(() => {
-        const el = contentMeasuredRef.current;
-        if (!el) return;
-        // Read actual DOM height from new content before expanding
-        requestAnimationFrame(() => {
-          const h = el.getBoundingClientRect().height;
-          setTerminalContentHeight(h > 0 ? h : 300);
-          setBranchVisible(true);
-          setCopiedLine(null);
-        });
-      }, 50);
+        const h = measureHeight();
+        setTerminalContentHeight(h > 0 ? h : 300);
+        setBranchVisible(true);
+        setCopiedLine(null);
+      }, 60);
       return () => clearTimeout(t2);
     }, 180);
     return () => clearTimeout(t1);
-  }, [selectedBranch, displayBranch]);
+  }, [selectedBranch, displayBranch, measureHeight]);
 
   const copyCommand = (cmd: string, lineNum: number) => {
     navigator.clipboard.writeText(cmd).then(() => {
