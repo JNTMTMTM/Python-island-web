@@ -4,15 +4,16 @@ import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react
 import { Github } from 'lucide-react';
 import { developData } from '../data/developData';
 
-type NavPage = '#hero' | '#features' | '#branches' | '#develop' | '#contributors';
+type NavPage = '#hero' | '#features' | '#branches' | '#develop' | '#contributors' | '#download';
 
-const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#develop', '#contributors'];
+const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#develop', '#contributors', '#download'];
 
 const PAGE_TITLES: Record<Exclude<NavPage, '#hero'>, { title: string; subtitle: string }> = {
   '#features': { title: '核心功能', subtitle: '每一个细节都为 Windows 用户精心打造' },
   '#branches': { title: '分支总览', subtitle: '探索 Pyisland 项目的多个分支版本' },
   '#develop': { title: '快速安装', subtitle: '选择版本，获取安装命令' },
   '#contributors': { title: '关于贡献者', subtitle: 'Python-island 项目团队' },
+  '#download': { title: '立即下载', subtitle: '选择适合您的版本进行下载' },
 };
 
 export default function DynamicIsland() {
@@ -23,6 +24,7 @@ export default function DynamicIsland() {
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
   const developBtnRef = useRef<HTMLButtonElement>(null);
   const contributorsBtnRef = useRef<HTMLButtonElement>(null);
+  const downloadBtnRef = useRef<HTMLButtonElement>(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   const navigate = useCallback((hash: string) => {
@@ -117,6 +119,12 @@ export default function DynamicIsland() {
           width: contributorsBtnRef.current.offsetWidth - 12,
           opacity: 1,
         });
+      } else if (activePage === '#download' && downloadBtnRef.current) {
+        setIndicatorStyle({
+          left: downloadBtnRef.current.offsetLeft + 6,
+          width: downloadBtnRef.current.offsetWidth - 12,
+          opacity: 1,
+        });
       } else {
         setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
       }
@@ -127,7 +135,7 @@ export default function DynamicIsland() {
   const isHero = activePage === '#hero';
   const pageInfo = !isHero ? PAGE_TITLES[activePage] : null;
   const showTitle = !isHero;
-  const isDevelopContrib = activePage === '#develop' || activePage === '#contributors';
+  const isDevelopContrib = activePage === '#develop' || activePage === '#contributors' || activePage === '#download';
   const islandTop = isDevelopContrib ? '52px' : '24px';
   const showBranchSwitcher = activePage === '#develop';
   const showIslandExpanded = showTitle || showBranchSwitcher;
@@ -318,6 +326,24 @@ export default function DynamicIsland() {
                 className="diNavBtn"
               >
                 贡献者
+              </button>
+              <button
+                ref={downloadBtnRef}
+                onClick={() => navigate('#download')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  color: activePage === '#download' ? '#ffffff' : '#71717a',
+                  transition: 'color 0.2s ease',
+                  cursor: 'pointer',
+                  background: 'none',
+                  border: 'none',
+                }}
+                className="diNavBtn"
+              >
+                下载
               </button>
               {/* Active indicator underline */}
               <div

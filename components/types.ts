@@ -1,4 +1,4 @@
-export type ViewState = 'hero' | 'features' | 'branches' | 'develop' | 'contributors';
+export type ViewState = 'hero' | 'features' | 'branches' | 'develop' | 'contributors' | 'download';
 export type Phase = 'idle' | 'transitioning';
 
 export interface Contributor {

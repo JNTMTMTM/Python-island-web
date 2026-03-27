@@ -11,11 +11,12 @@ import FeaturesContent from './FeaturesContent';
 import BranchesContent from './BranchesContent';
 import DevelopContent from './DevelopContent';
 import ContributorContent from './ContributorContent';
+import DownloadContent from './DownloadContent';
 
 const ThreeScene = dynamic(
   () => import('./ThreeScene').then(m => m.ThreeSceneInner),
   { ssr: false }
-) as ComponentType<{ ref?: React.Ref<ThreeSceneHandle> }>;
+) as ComponentType<{ ref?: React.Ref<ThreeSceneHandle>; activeView: ViewState }>;
 
 const VIEW_TARGET: Record<ViewState, number> = {
   hero: 0,
@@ -23,6 +24,7 @@ const VIEW_TARGET: Record<ViewState, number> = {
   branches: 0.55,
   develop: 0.78,
   contributors: 1,
+  download: 1,
 };
 
 const DURATION = 800;
@@ -63,7 +65,8 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
       features: direction === 'down' ? 'branches' : 'hero',
       branches: direction === 'down' ? 'develop' : 'features',
       develop: direction === 'down' ? 'contributors' : 'branches',
-      contributors: direction === 'up' ? 'develop' : null,
+      contributors: direction === 'down' ? 'download' : 'develop',
+      download: direction === 'up' ? 'contributors' : null,
     };
 
     const nextView = nextViewMap[view];
@@ -206,8 +209,8 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     let timer: ReturnType<typeof setTimeout>;
 
     const handleWheel = (e: WheelEvent) => {
-      // Don't intercept wheel when in contributors or develop view — they handle their own wheel
-      if (view === 'contributors' || view === 'develop') return;
+      // Don't intercept wheel when in contributors, develop, or download views — they handle their own wheel
+      if (view === 'contributors' || view === 'develop' || view === 'download') return;
       e.preventDefault();
       accumulator += e.deltaY;
 
@@ -254,7 +257,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
 
       {/* Three.js Canvas */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 2 }}>
-        <ThreeScene ref={threeRef} />
+        <ThreeScene ref={threeRef} activeView={activeView} />
       </div>
 
       {/* Hero */}
@@ -301,6 +304,14 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         currentDev={currentDev}
         onSwitchDev={switchToContributor}
         onBackToDevelop={() => navigateTo('develop')}
+      />
+
+      {/* Download */}
+      <DownloadContent
+        progress={progress}
+        activeView={activeView}
+        phase={phaseState.phase}
+        onBackToContributors={() => navigateTo('contributors')}
       />
     </div>
   );

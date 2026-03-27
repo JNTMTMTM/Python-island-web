@@ -5,9 +5,14 @@ import * as THREE from 'three';
 import { createScene, addLights, createIslandGroup, createOuterGlowLayers, createCoreGlow, createParticles, createMouseTracker, createAnimationState, GlowLayer } from '@/lib/three/createElements';
 import { createAnimationLoop, AnimationState, SceneElements, SceneRefs, TransitionState } from '@/lib/three/animate';
 import type { ThreeSceneHandle } from '@/lib/three/types';
+import type { ViewState } from './types';
 export type { ThreeSceneHandle } from '@/lib/three/types';
 
-export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneInner(_, ref) {
+interface ThreeSceneInnerProps {
+  activeView: ViewState;
+}
+
+export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps>(function ThreeSceneInner({ activeView }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
   const transitionRef = useRef(0);
@@ -110,6 +115,10 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
     };
   }, []);
 
+  const pastBranches = activeView !== 'hero'
+    && activeView !== 'features'
+    && activeView !== 'branches';
+
   return (
     <div
       ref={containerRef}
@@ -121,6 +130,9 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle>(function ThreeSceneI
         height: '100%',
         zIndex: 0,
         overflow: 'hidden',
+        opacity: pastBranches ? 0 : 1,
+        transition: 'opacity 0.6s ease',
+        pointerEvents: pastBranches ? 'none' : 'auto',
       }}
       aria-hidden="true"
     />
