@@ -203,6 +203,8 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     let timer: ReturnType<typeof setTimeout>;
 
     const handleWheel = (e: WheelEvent) => {
+      // Don't intercept wheel when in developers view — DeveloperContent handles it
+      if (view === 'developers') return;
       e.preventDefault();
       accumulator += e.deltaY;
 

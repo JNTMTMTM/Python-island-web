@@ -196,6 +196,18 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
     return () => clearInterval(id);
   }, []);
 
+  // ── Wheel scroll: switch developer when in developers view ─────────────────
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (!isDevelopers || phase !== 'idle') return;
+      e.preventDefault();
+      const next = (currentDev + (e.deltaY > 0 ? 1 : -1) + developers.length) % developers.length;
+      onSwitchDev(next);
+    };
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [isDevelopers, phase, currentDev, onSwitchDev, developers.length]);
+
   // ── Dock magnify effect ──────────────────────────────────────────────────
   const dockContainerRef = useRef<HTMLDivElement>(null);
   const dockScales = useRef<number[]>(dockAvatars.map((_, i) => (i === currentDev ? 1.25 : 1.0)));
