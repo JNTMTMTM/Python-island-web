@@ -292,14 +292,15 @@ export default function DownloadsContent({
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
+                  // justifyContent: 'center',
                   padding: '4px 10px',
                   background: `${currentData.accent}12`,
                   border: `1px solid ${currentData.accent}28`,
                   borderRadius: '20px',
                 }}
               >
-                <span style={{ fontSize: '10px', fontWeight: '700', color: currentData.badgeColor, letterSpacing: '0.05em' }}>
-                  {currentData.badge}
+                <span style={{ fontSize: '10px', fontWeight: '600', color: `${currentData.accent}cc`, letterSpacing: '0.03em' }}>
+                  {currentData.name}
                 </span>
               </div>
               <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontWeight: '500' }}>
