@@ -72,7 +72,7 @@ export const downloadBranches: DownloadBranch[] = [
       '社区支持完善，文档齐全',
     ],
     audience: '追求稳定可靠的用户',
-    downloadUrl: 'https://download.pyisland.com/download/pyisland.exe',
+    downloadUrl: 'https://download.pyisland.com/download/Pyisland_V1.6.1.exe',
     downloadLabel: '立即下载',
     badge: '稳定版',
     badgeClass: stylesBadge.badgeAccent,
