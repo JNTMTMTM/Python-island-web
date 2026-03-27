@@ -609,6 +609,100 @@ export default function DeveloperContent({ progress, activeView, phase, currentD
             )}
           </div>
         </div>
+
+        {/* Developer navigation dots */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginTop: '20px',
+            opacity: slideInFactor,
+            transform: `translateY(${(1 - slideInFactor) * 10}px)`,
+            transition: 'transform 0.7s ease 0.15s, opacity 0.7s ease 0.15s',
+          }}
+        >
+          {developers.map((d, i) => (
+            <button
+              key={d.id}
+              onClick={() => onSwitchDev(i)}
+              title={d.name}
+              style={{
+                width: i === currentDev ? '24px' : '8px',
+                height: '8px',
+                borderRadius: '4px',
+                background: i === currentDev
+                  ? 'rgba(255,255,255,0.9)'
+                  : 'rgba(255,255,255,0.25)',
+                boxShadow: i === currentDev ? '0 0 6px rgba(255,255,255,0.4)' : 'none',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                padding: 0,
+              }}
+              onMouseEnter={e => {
+                if (i !== currentDev) {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+                  e.currentTarget.style.width = '12px';
+                }
+              }}
+              onMouseLeave={e => {
+                if (i !== currentDev) {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
+                  e.currentTarget.style.width = '8px';
+                }
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Page navigation controls */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            marginTop: '16px',
+            opacity: slideInFactor * 0.6,
+            transform: `translateY(${(1 - slideInFactor) * 20}px)`,
+            transition: 'transform 0.7s ease 0.2s, opacity 0.7s ease 0.2s',
+          }}
+        >
+          <button
+            onClick={onBackToDownloads}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              borderRadius: '10px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.7)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            下载
+          </button>
+
+          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>
+            点击 Dock 栏头像或上方圆点切换
+          </span>
+        </div>
       </div>
 
       {/* macOS Dock with developer avatars */}
