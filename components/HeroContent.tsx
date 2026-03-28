@@ -121,7 +121,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
         >
           {/* 下载按钮 */}
           <a
-            href="/download"
+            href="/#download"
             className={stylesButton.btnSecondary}
             onMouseEnter={() => threeRef.current?.setHover(true)}
             onMouseLeave={() => threeRef.current?.setHover(false)}

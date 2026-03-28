@@ -247,15 +247,32 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     };
     transitionRafRef.current = requestAnimationFrame(animate);
   }, [view]);
+  // 记录上一次导航的 hash，防止 hashchange 和 pyisland:navigate 同时触发造成重复调用
+  const lastHashRef = useRef<string>('');
+
+  // 监听原生 hashchange（锚点点击）和自定义 pyisland:navigate（DynamicIsland 内部导航）
   useEffect(() => {
     const handleNavigate = (e: Event) => {
       const hash = (e as CustomEvent<{ hash: string }>).detail.hash;
+      const target = hash.replace('#', '') as ViewState;
+      lastHashRef.current = hash;
+      navigateTo(target);
+    };
+
+    const handleHashChange = () => {
+      const hash = window.location.hash || '#hero';
+      if (lastHashRef.current === hash) return;
+      lastHashRef.current = hash;
       const target = hash.replace('#', '') as ViewState;
       navigateTo(target);
     };
 
     window.addEventListener('pyisland:navigate', handleNavigate);
-    return () => window.removeEventListener('pyisland:navigate', handleNavigate);
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('pyisland:navigate', handleNavigate);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [navigateTo]);
 
   // 切换到指定贡献者并显示贡献者视图
