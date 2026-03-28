@@ -10,6 +10,7 @@ interface DownloadContentProps {
   activeView: ViewState;
   phase: Phase;
   onBackToContributors: () => void;
+  onBackToHome: () => void;
 }
 
 type Branch = typeof downloadBranches[number];
@@ -26,6 +27,7 @@ export default function DownloadContent({
   activeView,
   phase,
   onBackToContributors,
+  onBackToHome,
 }: DownloadContentProps) {
   const isDownload = activeView === 'download';
   const isTransitioning = phase === 'transitioning';
@@ -74,7 +76,7 @@ export default function DownloadContent({
     return () => clearInterval(id);
   }, []);
 
-  // Wheel: up → previous card (or contributors if at first), down → next card
+  // Wheel: up → previous card (or contributors if at first), down → next card (or home if at last)
   const handleWheel = useCallback((e: WheelEvent) => {
     if (!isDownload || phase !== 'idle') return;
     if (e.deltaY < 0) {
@@ -88,11 +90,15 @@ export default function DownloadContent({
       }
     } else {
       e.preventDefault();
-      const next = Math.min(selectedIdx + 1, downloadBranches.length - 1);
-      setSelectedIdx(next);
-      window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: next }));
+      if (selectedIdx === downloadBranches.length - 1) {
+        onBackToHome();
+      } else {
+        const next = selectedIdx + 1;
+        setSelectedIdx(next);
+        window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: next }));
+      }
     }
-  }, [isDownload, phase, onBackToContributors, selectedIdx]);
+  }, [isDownload, phase, onBackToContributors, onBackToHome, selectedIdx]);
 
   useEffect(() => {
     window.addEventListener('wheel', handleWheel, { passive: false });
@@ -431,9 +437,6 @@ export default function DownloadContent({
                 {downloadBranches.filter(b => b.downloadLabel === '立即下载').length} 个版本可下载
               </span>
             </div>
-            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.20)', letterSpacing: '0.02em' }}>
-              Python Island v1.6
-            </span>
           </div>
         </div>
 

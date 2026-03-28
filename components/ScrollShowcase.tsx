@@ -311,6 +311,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         activeView={activeView}
         phase={phaseState.phase}
         onBackToContributors={() => navigateTo('contributors')}
+        onBackToHome={() => navigateTo('hero')}
       />
     </div>
   );
