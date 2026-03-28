@@ -131,7 +131,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
           </a>
           {/* 文档按钮 */}
           <a
-            href="/"
+            href="https://docs.pyisland.com"
             className={stylesButton.btnPrimary}
             onMouseEnter={() => threeRef.current?.setHover(true)}
             onMouseLeave={() => threeRef.current?.setHover(false)}
