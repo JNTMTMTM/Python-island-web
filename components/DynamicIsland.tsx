@@ -154,7 +154,7 @@ export default function DynamicIsland() {
   const showIslandExpanded = showTitle || showBranchSwitcher || showDownloadSwitcher;
   const islandRadius = showIslandExpanded ? '32px' : '28px';
   const outerRadius = showIslandExpanded ? '36px' : '32px';
-  const islandMinWidth = showIslandExpanded ? '380px' : '280px';
+  const islandMinWidth = showIslandExpanded ? '420px' : '320px';
 
   return (
       <div
@@ -219,7 +219,7 @@ export default function DynamicIsland() {
               justifyContent: 'center',
               gap: '4px',
               padding: '6px 10px',
-              minWidth: '240px',
+              minWidth: '470px',
             }}
           >
             {/* Left logo */}
@@ -408,6 +408,33 @@ export default function DynamicIsland() {
               className="diNavBtn"
             >
               <Github size={16} />
+            </a>
+
+            {/* Docs icon */}
+            <a
+              href="https://docs.pyisland.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Docs"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                borderRadius: '8px',
+                color: '#71717a',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease, background 0.2s ease',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+              className="diNavBtn"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
             </a>
           </div>
 
