@@ -174,7 +174,7 @@ export default function DevelopContent({
         backgroundSize: '400% 400%',
         animation: 'macBgShift 20s ease infinite',
         overflow: 'hidden',
-        paddingTop: '100px',
+        paddingTop: '140px',
       }}
     >
       {/* macOS menu bar */}
