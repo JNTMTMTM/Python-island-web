@@ -22,7 +22,7 @@ interface DesktopIconsProps {
 const APPS: AppIcon[] = [
   {
     id: 'develop',
-    label: '快速安装',
+    label: '开发指南',
     target: 'develop',
     bg: 'linear-gradient(145deg, #2a2a2a 0%, #181818 100%)',
     bgBorder: 'rgba(255,255,255,0.25)',
