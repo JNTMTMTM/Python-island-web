@@ -10,6 +10,9 @@ import type { MetadataRoute } from 'next';
 /** 网站基础 URL */
 const BASE_URL = 'https://pyisland.top';
 
+/** 强制静态渲染（兼容 output: export） */
+export const dynamic = 'force-static';
+
 /**
  * 站点地图生成函数
  * @description 返回网站的站点地图配置

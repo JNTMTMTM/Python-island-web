@@ -7,6 +7,9 @@
 
 import type { MetadataRoute } from 'next';
 
+/** 强制静态渲染（兼容 output: export） */
+export const dynamic = 'force-static';
+
 /**
  * 爬虫配置函数
  * @description 返回 robots.txt 配置，控制搜索引擎爬虫行为
