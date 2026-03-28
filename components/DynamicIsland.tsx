@@ -1,3 +1,10 @@
+/**
+ * @file DynamicIsland.tsx
+ * @description 顶部动态岛导航组件，处理页面路由和状态管理
+ * @description 提供 macOS 风格的顶部导航栏，支持页面切换、分支版本切换、下载版本切换等功能
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
@@ -5,10 +12,24 @@ import { Github } from 'lucide-react';
 import { developData } from '../data/developData';
 import { downloadBranches } from '../data/downloadData';
 
+/**
+ * 导航页面类型定义
+ * @description 定义所有可导航的页面标识符
+ */
 type NavPage = '#hero' | '#features' | '#branches' | '#develop' | '#contributors' | '#download';
 
+/**
+ * 导航顺序数组
+ * @description 定义页面的导航顺序，用于计算页面切换的上下文
+ */
 const NAV_ORDER: NavPage[] = ['#hero', '#features', '#branches', '#develop', '#contributors', '#download'];
 
+/**
+ * 页面标题配置
+ * @description 定义每个页面的标题和副标题，用于在动态岛中显示
+ * @key {NavPage} 页面标识符（排除首页）
+ * @value {title: string; subtitle: string} 页面标题和副标题
+ */
 const PAGE_TITLES: Record<Exclude<NavPage, '#hero'>, { title: string; subtitle: string }> = {
   '#features': { title: '核心功能', subtitle: '每一个细节都为 Windows 用户精心打造' },
   '#branches': { title: '分支总览', subtitle: '探索 Pyisland 项目的多个分支版本' },
@@ -17,23 +38,69 @@ const PAGE_TITLES: Record<Exclude<NavPage, '#hero'>, { title: string; subtitle: 
   '#download': { title: '立即下载', subtitle: '选择适合您的版本进行下载' },
 };
 
+/**
+ * 动态岛导航组件
+ * @description macOS 风格的顶部导航栏，支持页面切换和子项切换
+ * @description 通过自定义事件与其他组件通信，实现联动效果
+ * @returns JSX.Element
+ */
 export default function DynamicIsland() {
+  // ==================== 状态定义 ====================
+
+  /** 鼠标悬停状态，用于控制动态岛的高亮效果 */
   const [isHovered, setIsHovered] = useState(false);
+
+  /** 当前激活的页面，用于导航高亮和内容切换 */
   const [activePage, setActivePage] = useState<NavPage>('#hero');
+
+  /** 当前选中的开发分支索引（0~3），对应 developData 数组 */
   const [selectedBranch, setSelectedBranch] = useState(0);
+
+  /** 当前选中的下载分支索引（0~3），对应 downloadBranches 数组 */
   const [selectedDownload, setSelectedDownload] = useState(0);
+
+  // ==================== 引用定义 ====================
+
+  /** 功能按钮引用，用于计算指示器位置 */
   const featuresBtnRef = useRef<HTMLButtonElement>(null);
+
+  /** 分支按钮引用，用于计算指示器位置 */
   const branchesBtnRef = useRef<HTMLButtonElement>(null);
+
+  /** 开发按钮引用，用于计算指示器位置 */
   const developBtnRef = useRef<HTMLButtonElement>(null);
+
+  /** 贡献者按钮引用，用于计算指示器位置 */
   const contributorsBtnRef = useRef<HTMLButtonElement>(null);
+
+  /** 下载按钮引用，用于计算指示器位置 */
   const downloadBtnRef = useRef<HTMLButtonElement>(null);
+
+  /**
+   * 导航指示器样式状态
+   * @description 控制底部高亮下划线的位置、宽度和透明度
+   */
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
+  // ==================== 导航函数 ====================
+
+  /**
+   * 页面导航函数
+   * @description 更新 URL hash 并触发自定义导航事件
+   * @param hash - 目标页面的 hash 值（如 '#features'）
+   */
   const navigate = useCallback((hash: string) => {
     history.pushState(null, '', window.location.pathname + hash);
     window.dispatchEvent(new CustomEvent('pyisland:navigate', { detail: { hash } }));
   }, []);
 
+  // ==================== 事件监听器 ====================
+
+  /**
+   * 监听 URL hash 变化和自定义导航事件
+   * @description 根据当前 URL hash 更新激活的页面状态
+   * @description 监听浏览器原生 hashchange 事件和自定义 pyisland:navigate 事件
+   */
   useEffect(() => {
     const updateActivePage = () => {
       const hash = (window.location.hash || '#hero') as NavPage;
@@ -54,6 +121,11 @@ export default function DynamicIsland() {
     };
   }, []);
 
+  /**
+   * 监听页面过渡进度事件
+   * @description 在页面切换过程中，根据过渡进度更新动态岛显示的页面
+   * @description 实现页面切换时导航栏的高亮跟随效果
+   */
   useEffect(() => {
     let rafId: number | null = null;
 
@@ -85,7 +157,11 @@ export default function DynamicIsland() {
     };
   }, [activePage]);
 
-  // Listen for branch-select from DevelopContent (wheel scroll) to update island visual state
+  /**
+   * 监听开发分支选择事件
+   * @description 接收来自 DevelopContent 组件的分支选择事件（滚轮切换触发）
+   * @description 更新动态岛显示的选中分支索引
+   */
   useEffect(() => {
     const handleBranchSelect = (e: Event) => {
       const idx = (e as CustomEvent<number>).detail;
@@ -95,7 +171,11 @@ export default function DynamicIsland() {
     return () => window.removeEventListener('pyisland:branch-select', handleBranchSelect);
   }, [selectedBranch]);
 
-  // Listen for download-select from DownloadContent (dot/wheel navigation) to update island visual state
+  /**
+   * 监听下载分支选择事件
+   * @description 接收来自 DownloadContent 组件的分支选择事件（点选或滚轮切换触发）
+   * @description 更新动态岛显示的选中下载分支索引
+   */
   useEffect(() => {
     const handleDownloadSelect = (e: Event) => {
       const idx = (e as CustomEvent<number>).detail;
@@ -105,18 +185,37 @@ export default function DynamicIsland() {
     return () => window.removeEventListener('pyisland:download-select', handleDownloadSelect);
   }, [selectedDownload]);
 
-  // Handle island-initiated branch switch — notify DevelopContent
+  // ==================== 切换处理函数 ====================
+
+  /**
+   * 处理动态岛发起的分支切换
+   * @description 用户点击动态岛上的分支按钮时触发
+   * @description 更新本地状态并通知 DevelopContent 组件同步更新
+   * @param idx - 目标分支索引
+   */
   const handleIslandBranchSwitch = useCallback((idx: number) => {
     if (idx !== selectedBranch) setSelectedBranch(idx);
     window.dispatchEvent(new CustomEvent('pyisland:island-branch-select', { detail: idx }));
   }, [selectedBranch]);
 
-  // Handle island-initiated download switch — notify DownloadContent
+  /**
+   * 处理动态岛发起的下载分支切换
+   * @description 用户点击动态岛上的下载按钮时触发
+   * @description 更新本地状态并通知 DownloadContent 组件同步更新
+   * @param idx - 目标下载分支索引
+   */
   const handleIslandDownloadSwitch = useCallback((idx: number) => {
     if (idx !== selectedDownload) setSelectedDownload(idx);
     window.dispatchEvent(new CustomEvent('pyisland:island-download-select', { detail: idx }));
   }, [selectedDownload]);
 
+  // ==================== 布局计算 ====================
+
+  /**
+   * 更新导航指示器位置
+   * @description 根据当前激活的页面，计算并设置底部高亮下划线的位置和宽度
+   * @description 使用 useLayoutEffect 确保在 DOM 更新前同步更新，避免闪烁
+   */
   useLayoutEffect(() => {
     const updateIndicator = () => {
       if (activePage === '#features' && featuresBtnRef.current) {
@@ -156,16 +255,39 @@ export default function DynamicIsland() {
     updateIndicator();
   }, [activePage]);
 
+  // ==================== 计算属性 ====================
+
+  /** 是否在首页 */
   const isHero = activePage === '#hero';
+
+  /** 当前页面信息（标题和副标题），首页不显示 */
   const pageInfo = !isHero ? PAGE_TITLES[activePage] : null;
+
+  /** 是否显示页面标题 */
   const showTitle = !isHero;
+
+  /** 是否为深色背景页面（需要调整动态岛位置） */
   const isDarkPage = activePage === '#develop' || activePage === '#contributors' || activePage === '#download';
+
+  /** 动态岛距离顶部的距离 */
   const islandTop = isDarkPage ? '52px' : '24px';
+
+  /** 是否显示分支切换器 */
   const showBranchSwitcher = activePage === '#develop';
+
+  /** 是否显示下载分支切换器 */
   const showDownloadSwitcher = activePage === '#download';
+
+  /** 是否显示扩展内容（标题或切换器） */
   const showIslandExpanded = showTitle || showBranchSwitcher || showDownloadSwitcher;
+
+  /** 动态岛内边框圆角半径 */
   const islandRadius = showIslandExpanded ? '32px' : '28px';
+
+  /** 动态岛外边框圆角半径 */
   const outerRadius = showIslandExpanded ? '36px' : '32px';
+
+  /** 动态岛最小宽度 */
   const islandMinWidth = showIslandExpanded ? '420px' : '320px';
 
   return (

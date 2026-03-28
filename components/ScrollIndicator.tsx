@@ -1,11 +1,26 @@
+/**
+ * @file ScrollIndicator.tsx
+ * @description 滚动指示器组件
+ * @description 显示在页面底部，提示用户继续向下滚动或继续探索
+ * @description 仅在 hero 和 features 视图下可见，过渡动画淡入淡出
+ * @author 鸡哥
+ */
+
 'use client';
 
 import type { ViewState } from '@/data/viewState';
 
+/**
+ * 滚动指示器组件属性接口
+ */
 interface ScrollIndicatorProps {
   activeView: ViewState;
 }
 
+/**
+ * 滚动指示器组件
+ * 显示在页面底部，提示用户继续向下滚动
+ */
 export default function ScrollIndicator({ activeView }: ScrollIndicatorProps) {
   return (
     <div
@@ -25,6 +40,7 @@ export default function ScrollIndicator({ activeView }: ScrollIndicatorProps) {
         transition: 'opacity 0.4s ease',
       }}
     >
+      {/* 提示文本 */}
       <span
         style={{
           fontSize: '11px',
@@ -36,6 +52,7 @@ export default function ScrollIndicator({ activeView }: ScrollIndicatorProps) {
       >
         {activeView === 'features' ? '继续探索' : '向下滚动'}
       </span>
+      {/* 装饰线条 */}
       <div
         style={{
           width: '1px',

@@ -1,9 +1,21 @@
+/**
+ * @file DesktopIcons.tsx
+ * @description 桌面图标组件
+ * @description macOS 风格的左侧边栏桌面图标（开发指南 / 贡献者 / 立即下载）
+ * @description 支持悬停放大、点击导航、弹跳动画和图标光泽高亮效果
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import type { ViewState } from '@/data/viewState';
 import styles from '@/styles/appIcons.module.css';
 
+/**
+ * 应用图标接口
+ * 定义桌面图标的属性
+ */
 interface AppIcon {
   id: string;
   label: string;
@@ -14,11 +26,15 @@ interface AppIcon {
   accent: string;
 }
 
+/**
+ * 桌面图标组件属性接口
+ */
 interface DesktopIconsProps {
   activeView: ViewState;
   onNavigate: (view: ViewState) => void;
 }
 
+// 桌面应用图标数据
 const APPS: AppIcon[] = [
   {
     id: 'develop',
@@ -67,12 +83,25 @@ const APPS: AppIcon[] = [
   },
 ];
 
+/**
+ * 桌面图标组件
+ * macOS 风格的桌面图标，支持悬停、点击和弹跳动画
+ */
 export default function DesktopIcons({ activeView, onNavigate }: DesktopIconsProps) {
+  // 当前悬停的图标索引
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  // 当前正在弹跳的图标 ID
   const [bouncingId, setBouncingId] = useState<string | null>(null);
+  // 弹跳动画 key，用于重新触发动画
   const [bounceKey, setBounceKey] = useState<number>(0);
+  // 定时器引用，用于清除弹跳状态
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /**
+   * 处理图标点击事件
+   * 如果已处于目标视图且为开发指南，触发弹跳动画
+   * 否则导航到目标视图
+   */
   const handleClick = useCallback((app: AppIcon) => {
     if (activeView === app.target) {
       if (app.id === 'develop') {
@@ -144,10 +173,10 @@ export default function DesktopIcons({ activeView, onNavigate }: DesktopIconsPro
                 transition: isBouncing ? 'none' : 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease',
                 position: 'relative',
                 overflow: 'hidden',
-              }}
-            >
-              {/* Gloss highlight */}
-              <div style={{
+            }}
+          >
+            {/* 光泽高光效果 */}
+            <div style={{
                 position: 'absolute',
                 inset: 0,
                 borderRadius: '14px',
@@ -156,7 +185,7 @@ export default function DesktopIcons({ activeView, onNavigate }: DesktopIconsPro
               }} />
               {app.icon}
             </div>
-            {/* Icon label — macOS style below icon */}
+            {/* 图标标签 — macOS 风格，位于图标下方 */}
             <span style={{
               fontSize: '10px',
               color: 'rgba(255,255,255,0.9)',

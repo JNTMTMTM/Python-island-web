@@ -1,4 +1,12 @@
-/* Desktop icon bounce animation */
+/**
+ * @file appIcons.module.css
+ * @description 桌面图标样式模块
+ * @description 定义 macOS 风格桌面图标的弹跳动画（appBounce）
+ * @description 配合 DesktopIcons 组件实现图标点击后的弹性动画效果
+ * @author 鸡哥
+ */
+
+/* ── 桌面图标弹跳动画 ─────────────────────────────────────────── */
 @keyframes appBounce {
   0%   { transform: scale(1) translateY(0px); }
   20%  { transform: scale(1.32) translateY(-14px); }
@@ -8,6 +16,7 @@
   100% { transform: scale(1) translateY(0px); }
 }
 
+/* 弹跳动画类 */
 .bounce {
   animation: appBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }

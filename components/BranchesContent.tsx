@@ -1,9 +1,18 @@
+/**
+ * @file BranchesContent.tsx
+ * @description 分支总览内容组件
+ * @description 展示 Pyisland 项目的四个分支版本（PySide6 / 万酷 / Tauri / PyQt5）
+ * @description 以四卡片布局呈现，支持滑入动画和毛玻璃效果
+ * @author 鸡哥
+ */
+
 'use client';
 
 import stylesGlass from '@/styles/glass.module.css';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 
+// 项目分支数据
 const branches = [
   {
     id: 'pyside6',
@@ -55,7 +64,12 @@ const branches = [
   },
 ];
 
+/**
+ * 分支卡片组件
+ * 显示单个项目分支的信息卡片
+ */
 function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slideIn: number }) {
+  // 判断卡片是否在左侧
   const isLeft = branch.position.includes('left');
 
   return (
@@ -65,6 +79,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
       rel="noopener noreferrer"
       style={{ display: 'block', textDecoration: 'none', cursor: 'pointer' }}
     >
+      {/* 卡片容器 */}
       <div
         className={stylesGlass.branchCard}
         style={{
@@ -79,6 +94,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
           overflow: 'hidden',
         }}
       >
+        {/* 顶部装饰线 */}
         <div
           className="branch-card-topline"
           style={{
@@ -92,6 +108,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             transition: 'opacity 0.3s ease',
           }}
         />
+        {/* 徽章标签 */}
         <div
           className="branch-card-badge"
           style={{
@@ -126,12 +143,15 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
           {branch.name}
           <span className="branch-card-arrow" style={{ fontSize: '12px', color: '#86868B' }}>→</span>
         </h4>
+        {/* 标语 */}
         <p style={{ fontSize: '11px', color: branch.accent, fontWeight: '500', marginBottom: '8px', letterSpacing: '0.02em' }}>
           {branch.tagline}
         </p>
+        {/* 描述文本 */}
         <p style={{ fontSize: '12px', color: '#86868B', lineHeight: 1.5, marginBottom: '12px' }}>
           {branch.description}
         </p>
+        {/* 技术标签 */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
           {branch.tech.map(tech => (
             <span
@@ -149,6 +169,7 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
             </span>
           ))}
         </div>
+        {/* 外部链接图标 */}
         <div
           className="branch-card-link-icon"
           style={{
@@ -171,6 +192,9 @@ function BranchCard({ branch, slideIn }: { branch: typeof branches[number]; slid
   );
 }
 
+/**
+ * 分支内容组件属性接口
+ */
 interface BranchesContentProps {
   progress: number;
   activeView: ViewState;
@@ -178,12 +202,15 @@ interface BranchesContentProps {
 }
 
 export default function BranchesContent({ progress, activeView, phase }: BranchesContentProps) {
+  // 判断当前是否为 branches 视图
   const isBranches = activeView === 'branches';
+  // 判断是否处于过渡状态
   const isTransitioning = phase === 'transitioning';
 
-  // Slide-out: when transitioning branches→develop or branches→contributors, branches fades out
+  // 滑出效果：branches→develop 或 branches→contributors 过渡期间，branches 应该淡出
   const slideOut = isTransitioning && (activeView === 'develop' || activeView === 'contributors') ? progress : 0;
 
+  // 计算透明度和滑入因子
   const opacity = isBranches ? Math.max(0, 1 - slideOut) : 0;
   const slideInFactor = isBranches ? 1 : 0;
 
@@ -212,7 +239,7 @@ export default function BranchesContent({ progress, activeView, phase }: Branche
           justifyContent: 'center',
         }}
       >
-        {/* Left column — two cards stacked */}
+        {/* 左列：2张卡片堆叠 */}
         <div
           style={{
             position: 'absolute',
@@ -229,7 +256,7 @@ export default function BranchesContent({ progress, activeView, phase }: Branche
           <BranchCard branch={branches[2]} slideIn={slideInFactor} />
         </div>
 
-        {/* Right column — two cards stacked */}
+        {/* 右列：2张卡片堆叠 */}
         <div
           style={{
             position: 'absolute',
@@ -246,7 +273,7 @@ export default function BranchesContent({ progress, activeView, phase }: Branche
           <BranchCard branch={branches[3]} slideIn={slideInFactor} />
         </div>
 
-        {/* Hint below */}
+        {/* 底部提示 */}
         <div
           style={{
             position: 'absolute',

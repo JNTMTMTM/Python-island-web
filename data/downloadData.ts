@@ -1,16 +1,40 @@
+/**
+ * @file downloadData.ts
+ * @description 下载分支数据定义
+ * @description 包含各个可下载分支的版本信息和下载链接
+ * @author 鸡哥
+ */
+
+/**
+ * 下载分支接口
+ * @description 定义下载分支的完整信息结构
+ */
 export interface DownloadBranch {
+  /** 分支唯一标识 */
   id: string;
+  /** 分支名称 */
   name: string;
+  /** 分支标语 */
   tagline: string;
+  /** 分支描述 */
   description: string;
+  /** 特性列表 */
   features: string[];
+  /** 适用人群 */
   audience: string;
+  /** 下载链接 */
   downloadUrl: string;
+  /** 下载按钮标签 */
   downloadLabel: string;
+  /** 徽章文字 */
   badge: string;
+  /** 主题色 */
   accentColor: string;
+  /** 主题背景色 */
   accentBg: string;
+  /** 主题边框色 */
   accentBorder: string;
+  /** 短标签 */
   label: string;
 }
 

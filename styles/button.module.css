@@ -1,5 +1,15 @@
-/* ── Buttons ────────────────────────────────────────────────────────────── */
+/**
+ * @file button.module.css
+ * @description 按钮组件样式
+ * @description 定义主要按钮和次要按钮的样式，包括悬停和激活状态
+ * @author 鸡哥
+ */
 
+/* ── 主要按钮样式 ────────────────────────────────────────────────────────────── */
+/**
+ * 主要按钮样式
+ * @description 用于主要操作按钮，深色背景
+ */
 .btnPrimary {
   display: inline-flex;
   align-items: center;
@@ -23,6 +33,10 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
+/**
+ * 主要按钮渐变遮罩
+ * @description 悬停时显示的渐变光效
+ */
 .btnPrimary::before {
   content: '';
   position: absolute;
@@ -32,10 +46,17 @@
   transition: opacity 0.25s;
 }
 
+/**
+ * 主要按钮悬停状态
+ */
 .btnPrimary:hover::before {
   opacity: 1;
 }
 
+/**
+ * 主要按钮悬停效果
+ * @description 悬停时背景变深，按钮上移，增强阴影
+ */
 .btnPrimary:hover {
   background: #2D2D2F;
   transform: translateY(-1px) translateZ(10000px);
@@ -43,11 +64,20 @@
   transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.3s ease;
 }
 
+/**
+ * 主要按钮激活状态
+ * @description 点击时按钮下移，阴影减弱
+ */
 .btnPrimary:active {
   transform: translateY(0) translateZ(10000px);
   box-shadow: 0 2px 6px rgba(29, 29, 31, 0.2);
 }
 
+/* ── 次要按钮样式 ────────────────────────────────────────────────────────────── */
+/**
+ * 次要按钮样式
+ * @description 用于次要操作按钮，毛玻璃效果，半透明白色背景
+ */
 .btnSecondary {
   display: inline-flex;
   align-items: center;
@@ -73,6 +103,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/**
+ * 次要按钮渐变遮罩
+ * @description 悬停时显示的渐变光效
+ */
 .btnSecondary::before {
   content: '';
   position: absolute;
@@ -82,10 +116,17 @@
   transition: opacity 0.25s;
 }
 
+/**
+ * 次要按钮悬停状态
+ */
 .btnSecondary:hover::before {
   opacity: 1;
 }
 
+/**
+ * 次要按钮悬停效果
+ * @description 悬停时背景变深，边框颜色加深，按钮上移，增强阴影
+ */
 .btnSecondary:hover {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(0, 0, 0, 0.12);
@@ -94,6 +135,10 @@
   color: #1D1D1F;
 }
 
+/**
+ * 次要按钮激活状态
+ * @description 点击时按钮下移，背景变淡
+ */
 .btnSecondary:active {
   transform: translateY(0) translateZ(10000px);
   background: rgba(255, 255, 255, 0.85);

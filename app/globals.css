@@ -1,17 +1,27 @@
+/**
+ * @file globals.css
+ * @description 全局样式入口文件
+ * @description 导入所有样式模块、定义 CSS 变量、设置全局重置样式
+ * @description 包含噪点覆盖层、macOS 动态背景动画等全局效果
+ * @author 鸡哥
+ */
+
+/* ── 全局样式入口 ──────────────────────────────────────────────── */
 @import '../styles/tokens.css';
 @import '../styles/typography.module.css';
 @import '../styles/glass.module.css';
 @import '../styles/button.module.css';
-/* @import '../styles/badge.module.css'; */
 @import '../styles/effect.module.css';
 
-/* Dynamic Island nav button hover — forces white on hover over any JS re-render */
+/* Dynamic Island 导航按钮悬停样式 */
+/* 强制悬停时显示白色文本，覆盖任何 JS 重新渲染的样式 */
 .diNavBtn:hover {
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* macOS desktop animated background */
+/* macOS 桌面动态背景动画 */
+/* 创建一个平滑的背景渐变移动效果 */
 @keyframes macBgShift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }

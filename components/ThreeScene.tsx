@@ -1,3 +1,11 @@
+/**
+ * @file ThreeScene.tsx
+ * @description Three.js 3D 场景组件
+ * @description 创建并管理 Three.js 场景，包括岛屿、光效、粒子等 3D 元素
+ * @description 提供对外接口供父组件控制场景动画
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
@@ -8,32 +16,76 @@ import type { ThreeSceneHandle } from '@/lib/three/types';
 import type { ViewState } from '@/data/viewState';
 export type { ThreeSceneHandle } from '@/lib/three/types';
 
+/**
+ * ThreeScene 组件属性接口
+ */
 interface ThreeSceneInnerProps {
+  /** 当前激活的视图状态 */
   activeView: ViewState;
 }
 
+/**
+ * ThreeScene 内部组件
+ * @description 使用 forwardRef 暴露控制方法给父组件
+ * @param props - 组件属性
+ * @param props.activeView - 当前激活的视图
+ * @param ref - 组件引用
+ * @returns JSX.Element
+ */
 export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps>(function ThreeSceneInner({ activeView }, ref) {
+  // ==================== 引用定义 ====================
+
+  /** 容器引用 */
   const containerRef = useRef<HTMLDivElement>(null);
+
+  /** 悬停状态引用 */
   const hoverRef = useRef(false);
+
+  /** 过渡进度引用（0~1） */
   const transitionRef = useRef(0);
-  // Separate ref for the raw multi-view target (0 / 0.5 / 1) — must be a ref so useImperativeHandle can access it
+
+  /**
+   * 多视图目标位置引用（0 / 0.5 / 1）
+   * @description 必须是 ref，以便 useImperativeHandle 可以访问
+   */
   const viewTargetRef = useRef(0);
+
+  /** 当前色相引用，用于与 CSS 同步 */
   const hueRef = useRef(0);
 
+  // ==================== 暴露控制方法 ====================
+
+  /**
+   * 暴露给父组件的控制方法
+   * @description 使用 useImperativeHandle 自定义暴露给父组件的引用
+   */
   useImperativeHandle(ref, () => ({
+    /**
+     * 设置悬停状态
+     * @param active - 是否悬停
+     */
     setHover: (active: boolean) => {
       hoverRef.current = active;
     },
-    /** Set the eased progress value during animation (0→1 within a transition) */
+    /**
+     * 设置动画期间的缓动进度值（过渡时为 0→1）
+     * @param progress - 进度值（0~1）
+     */
     setTransition: (progress: number) => {
       transitionRef.current = progress;
     },
-    /** Set the raw multi-view target: 0=hero, 0.33=features, 0.55=branches, 0.78=develop, 1=contributors */
+    /**
+     * 设置多视图目标位置：0=hero, 0.33=features, 0.55=branches, 0.78=develop, 1=contributors
+     * @param target - 目标位置（0~1）
+     */
     setViewTarget: (target: number) => {
       viewTargetRef.current = target;
     },
+    /** 色相引用，用于外部读取 */
     hueRef,
   }));
+
+  // ==================== 初始化 Three.js 场景 ====================
 
   useEffect(() => {
     const container = containerRef.current;
@@ -42,37 +94,37 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps
     const { width, height } = container.getBoundingClientRect();
     if (!width || !height) return;
 
-    // Create scene
+    // 创建场景
     const { scene, camera, renderer } = createScene(container);
 
-    // Add lights
+    // 添加灯光
     addLights(scene);
 
-    // Create island group with pill and inner glow
+    // 创建岛屿组（包含胶囊体和内部光效）
     const { group: islandGroup, pill, glow, glowMat } = createIslandGroup();
     scene.add(islandGroup);
 
-    // Create outer glow layers
+    // 创建外部光效层
     const outerGlowLayers: GlowLayer[] = createOuterGlowLayers(islandGroup);
 
-    // Create core glow
+    // 创建核心光效
     const coreMat: THREE.MeshBasicMaterial = createCoreGlow(islandGroup);
 
-    // Create particles
+    // 创建粒子系统
     const { points: particles, mat: particleMat } = createParticles(scene);
 
-    // Raycaster for hover detection
+    // 创建射线检测器，用于鼠标悬停检测
     const raycaster = new THREE.Raycaster();
 
-    // Create mouse tracker
+    // 创建鼠标跟踪器
     const { mouse, onMouseMove } = createMouseTracker();
     window.addEventListener('mousemove', onMouseMove);
 
-    // Create animation state
+    // 创建动画状态
     const animationState: AnimationState = createAnimationState();
     const transitionState: TransitionState = { current: 0, multiViewTarget: 0 };
 
-    // Bundle scene elements
+    // 封装场景元素
     const elements: SceneElements = {
       islandGroup,
       pill,
@@ -85,13 +137,13 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps
       raycaster,
     };
 
-    // Bundle refs
+    // 封装引用
     const refs: SceneRefs = { mouse, hoverRef, transitionRef, viewTargetRef, transitionState, hueRef };
 
-    // Start animation loop
+    // 启动动画循环
     const cleanup = createAnimationLoop(renderer, scene, camera, elements, refs, animationState);
 
-    // Resize handler
+    // 窗口大小改变处理
     const onResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -103,7 +155,7 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps
     };
     window.addEventListener('resize', onResize);
 
-    // Cleanup
+    // 清理函数
     return () => {
       cleanup();
       window.removeEventListener('mousemove', onMouseMove);
@@ -115,6 +167,9 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps
     };
   }, []);
 
+  // ==================== 计算属性 ====================
+
+  /** 是否已越过分支页面（需要隐藏 3D 场景） */
   const pastBranches = activeView !== 'hero'
     && activeView !== 'features'
     && activeView !== 'branches';

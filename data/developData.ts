@@ -1,16 +1,39 @@
+/**
+ * @file developData.ts
+ * @description 开发分支数据定义
+ * @description 包含各个开发分支的安装方法和配置信息
+ * @author 鸡哥
+ */
+
+/**
+ * 开发分支接口
+ * @description 定义开发分支的完整信息结构
+ */
 export interface DevelopItem {
+  /** 分支唯一标识 */
   id: string;
+  /** 分支名称 */
   name: string;
+  /** 分支标语 */
   tagline: string;
+  /** 徽章文字 */
   badge: string;
+  /** 徽章颜色 */
   badgeColor: string;
+  /** 主题色 */
   accent: string;
+  /** GitHub 仓库链接 */
   href: string;
+  /** 安装方法数组（标题、命令、备注） */
   installMethods: {
+    /** 安装方法标题 */
     title: string;
+    /** 安装命令列表 */
     commands: string[];
+    /** 备注说明（可选） */
     note?: string;
   }[];
+  /** 环境要求（可选） */
   requirements?: string[];
 }
 

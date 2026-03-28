@@ -1,3 +1,10 @@
+/**
+ * @file DownloadContent.tsx
+ * @description 下载页面内容组件
+ * @description 展示各版本的下载信息，支持滚轮和点选切换
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -6,17 +13,31 @@ import type { Phase } from '@/data/phase';
 import { downloadBranches } from '@/data/downloadData';
 import DesktopIcons from './DesktopIcons';
 
+/**
+ * 下载内容组件属性接口
+ */
 interface DownloadContentProps {
+  /** 过渡进度（0~1） */
   progress: number;
+  /** 当前激活的视图 */
   activeView: ViewState;
+  /** 动画阶段 */
   phase: Phase;
+  /** 返回贡献者页面回调 */
   onBackToContributors: () => void;
+  /** 返回首页回调 */
   onBackToHome: () => void;
+  /** 导航到指定页面回调 */
   onNavigate: (view: ViewState) => void;
 }
 
+/** 下载分支类型 */
 type Branch = typeof downloadBranches[number];
 
+/**
+ * 分支颜色配置
+ * @description 定义各分支的发光颜色和暗光颜色
+ */
 const BRANCH_COLORS: Record<string, { glow: string; glowDim: string }> = {
   'tauri-island':    { glow: 'rgba(5,150,105,0.28)',   glowDim: 'rgba(5,150,105,0.10)' },
   'pyislandqt':      { glow: 'rgba(217,119,6,0.26)',   glowDim: 'rgba(217,119,6,0.10)' },
@@ -24,6 +45,12 @@ const BRANCH_COLORS: Record<string, { glow: string; glowDim: string }> = {
   'pyisland-wanku':  { glow: 'rgba(139,92,246,0.26)', glowDim: 'rgba(139,92,246,0.10)' },
 };
 
+/**
+ * 下载内容组件
+ * @description 展示下载分支信息，支持滚轮切换和点选
+ * @param props - 组件属性
+ * @returns JSX.Element
+ */
 export default function DownloadContent({
   progress,
   activeView,
@@ -32,19 +59,43 @@ export default function DownloadContent({
   onBackToHome,
   onNavigate,
 }: DownloadContentProps) {
+  // ==================== 状态定义 ====================
+
+  /** 是否在下载页面 */
   const isDownload = activeView === 'download';
+
+  /** 是否正在过渡动画中 */
   const isTransitioning = phase === 'transitioning';
 
+  // ==================== 计算属性 ====================
+
+  /** 滑出进度（从贡献者页面进入时） */
   const slideOut = isTransitioning && activeView === 'contributors' ? progress : 0;
+
+  /** 透明度（淡入淡出） */
   const opacity = isDownload ? Math.max(0, 1 - slideOut) : 0;
+
+  /** 滑入因子（0~1） */
   const slideInFactor = isDownload ? 1 : 0;
 
+  /** 当前选中的索引 */
   const [selectedIdx, setSelectedIdx] = useState(0);
+
+  /** 当前显示的索引（用于动画） */
   const [displayIdx, setDisplayIdx] = useState(0);
+
+  /** 内容是否可见（用于切换动画） */
   const [contentVisible, setContentVisible] = useState(true);
+
+  /** 卡片是否悬停 */
   const [cardHovered, setCardHovered] = useState(false);
 
-  // Two-phase switch: fade out → switch → fade in; also sync island switcher
+  // ==================== 切换动画 ====================
+
+  /**
+   * 两阶段切换动画：淡出 → 切换 → 淡入
+   * @description 同时同步动态岛切换器的显示
+   */
   useEffect(() => {
     if (selectedIdx === displayIdx) return;
     setContentVisible(false);

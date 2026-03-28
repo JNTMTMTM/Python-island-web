@@ -1,3 +1,11 @@
+/**
+ * @file ContributorContent.tsx
+ * @description 贡献者内容组件
+ * @description macOS 风格的贡献者展示页面，包含个人资料卡片、macOS 菜单栏和 Dock 图标栏
+ * @description 支持滚轮切换贡献者、头像悬停放大、卡片切换动画等功能
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -7,10 +15,14 @@ import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 import { contributors } from '../data/contributorData';
 
+// Dock 放大效果的最大缩放比例
 const MAX_SCALE = 1.25;
+// 相邻项目的缩放比例步长
 const NEIGHBOR_SCALE_STEPS = [1.12, 1.06, 1.0];
-const ITEM_W = 62; // icon width (52) + gap (10)
+// 单个图标项目的宽度（图标 52px + 间距 10px）
+const ITEM_W = 62;
 
+// 为贡献者添加头像路径
 const dockAvatars = contributors.map(dev => {
   const avatarMap: Record<string, string> = {
     StarWindv: '/avatar/StarWindv.png',
@@ -27,6 +39,9 @@ const dockAvatars = contributors.map(dev => {
   };
 });
 
+/**
+ * 贡献者内容组件属性接口
+ */
 interface ContributorContentProps {
   progress: number;
   activeView: ViewState;
@@ -36,23 +51,32 @@ interface ContributorContentProps {
   onNavigate: (view: ViewState) => void;
 }
 
+/**
+ * 贡献者内容组件
+ * macOS 风格的贡献者展示页面，包含个人资料卡片和 Dock 图标栏
+ */
 export default function ContributorContent({ progress, activeView, phase, currentDev, onSwitchDev, onNavigate }: ContributorContentProps) {
+  // 判断当前是否为 contributors 视图
   const isContributors = activeView === 'contributors';
+  // 判断是否处于过渡状态
   const isTransitioning = phase === 'transitioning';
 
+  // 计算滑出、透明度和滑入因子
   const slideOut = isTransitioning && (activeView === 'branches' || activeView === 'develop') ? progress : 0;
   const opacity = isContributors ? Math.max(0, 1 - slideOut) : 0;
   const slideInFactor = isContributors ? 1 : 0;
 
+  // 当前选中的贡献者
   const dev = contributors[currentDev];
-  const dockDev = dockAvatars[currentDev];
 
-  // Card switch animation state — tracks what's currently displayed
+  // 卡片切换动画状态 — 跟踪当前显示的内容
   const [displayDev, setDisplayDev] = useState(currentDev);
   const [cardVisible, setCardVisible] = useState(true);
   const [cardHovered, setCardHovered] = useState(false);
 
-  // Animate card content on developer switch
+  /**
+   * 在贡献者切换时动画化卡片内容
+   */
   useEffect(() => {
     if (currentDev !== displayDev) {
       setCardVisible(false);
@@ -64,6 +88,9 @@ export default function ContributorContent({ progress, activeView, phase, curren
     }
   }, [currentDev, displayDev]);
 
+  /**
+   * 获取 macOS 风格的时间
+   */
   const getMacTime = () => {
     const now = new Date();
     const h = now.getHours();
@@ -73,15 +100,20 @@ export default function ContributorContent({ progress, activeView, phase, curren
     return `${period} ${displayHour}:${m}`;
   };
 
+  // macOS 风格时间显示
   const [macTime, setMacTime] = useState(getMacTime);
 
+  // 每秒更新时间
   useEffect(() => {
     const tick = () => setMacTime(getMacTime());
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
-  // ── Wheel scroll: switch developer when in contributors view ─────────────────
+  /**
+   * 滚轮滚动切换贡献者
+   * 在 contributors 视图中，上下滚动切换不同的贡献者
+   */
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (!isContributors || phase !== 'idle') return;
@@ -107,15 +139,23 @@ export default function ContributorContent({ progress, activeView, phase, curren
     return () => window.removeEventListener('wheel', handleWheel);
   }, [isContributors, phase, currentDev, onSwitchDev, onNavigate, contributors.length]);
 
-  // ── Dock magnify effect ──────────────────────────────────────────────────
+  /**
+   * Dock 放大效果
+   * 实现类似 macOS Dock 的悬停放大效果
+   */
+  // Dock 容器引用
   const dockContainerRef = useRef<HTMLDivElement>(null);
+  // 每个图标的缩放比例
   const dockScales = useRef<number[]>(dockAvatars.map((_, i) => (i === currentDev ? MAX_SCALE : 1.0)));
+  // 用于强制更新组件
   const [, forceUpdate] = useState(0);
   const lastMouseX = useRef<number | null>(null);
-  /** Index of the item the mouse is directly over */
+  /** 鼠标当前悬停的项目索引 */
   const hoveredIdx = useRef<number | null>(null);
 
-  // ── Sync dock selection highlight when currentDev changes ───────────────────
+  /**
+   * 当 currentDev 变化时同步 Dock 选中高亮
+   */
   useEffect(() => {
     if (hoveredIdx.current === null) {
       dockScales.current = dockAvatars.map((_, i) => (i === currentDev ? MAX_SCALE : 1.0));
@@ -123,6 +163,10 @@ export default function ContributorContent({ progress, activeView, phase, curren
     }
   }, [currentDev]);
 
+  /**
+   * 处理 Dock 鼠标移动事件
+   * 根据鼠标位置计算每个图标的缩放比例
+   */
   const handleDockMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const container = dockContainerRef.current;
     if (!container) return;
@@ -131,10 +175,11 @@ export default function ContributorContent({ progress, activeView, phase, curren
     const mouseY = e.clientY - rect.top;
 
     // First item center (accounting for top padding of 14px)
-    const firstCenter = 14 + 26; // padding + half icon
+    const firstCenter = 14 + 26; // 顶部内边距 + 图标一半高度
     const idx = Math.round((mouseY - firstCenter) / ITEM_W);
     const clampedIdx = Math.max(0, Math.min(dockAvatars.length - 1, idx));
 
+    // 根据距离计算每个图标的缩放比例
     const newScales = dockAvatars.map((_, i) => {
       const dist = Math.abs(i - clampedIdx);
       if (i === currentDev) return MAX_SCALE;
@@ -143,6 +188,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
       return 1.0;
     });
 
+    // 如果缩放比例有变化，更新并强制重渲染
     if (JSON.stringify(newScales) !== JSON.stringify(dockScales.current)) {
       dockScales.current = newScales;
       forceUpdate(n => n + 1);
@@ -152,6 +198,10 @@ export default function ContributorContent({ progress, activeView, phase, curren
     lastMouseX.current = mouseY;
   }, [currentDev]);
 
+  /**
+   * 处理 Dock 鼠标离开事件
+   * 重置所有图标到默认状态
+   */
   const handleDockMouseLeave = useCallback(() => {
     dockScales.current = dockAvatars.map((_, i) => (i === currentDev ? MAX_SCALE : 1.0));
     forceUpdate(n => n + 1);
@@ -208,18 +258,22 @@ export default function ContributorContent({ progress, activeView, phase, curren
           </span>
         ))}
       <div style={{ flex: 1 }} />
+      {/* 右侧状态栏：WiFi 图标、电池图标等 */}
         <svg width="14" height="10" viewBox="0 0 14 10" fill="rgba(255,255,255,0.85)">
           <path d="M1 4C1 2.9 1.9 2 3 2h8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V4zm0-1L0 3v4l1-1h12l1 1V3l-1 0H1z" />
           <path d="M4 5h6M4 7h3" stroke="rgba(255,255,255,0.7)" strokeWidth="1" fill="none" />
         </svg>
+        {/* 控中心下拉箭头 */}
         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.01em' }}>▼</span>
+        {/* 音量指示 */}
         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.85)' }}>100%</span>
+        {/* 时间显示 */}
         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.02em' }}>
           {macTime}
         </span>
       </div>
 
-      {/* Main content container */}
+      {/* 主内容容器 */}
       <div
         style={{
           position: 'relative',
@@ -234,7 +288,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
           marginTop: '0px',
         }}
       >
-        {/* Profile card */}
+        {/* 个人资料卡片 */}
         <div
           onMouseEnter={() => setCardHovered(true)}
           onMouseLeave={() => setCardHovered(false)}
@@ -253,7 +307,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
             transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.3s ease',
           }}
         >
-          {/* Window title bar */}
+          {/* 窗口标题栏 */}
           <div
             style={{
               padding: '16px 16px',
@@ -265,9 +319,11 @@ export default function ContributorContent({ progress, activeView, phase, curren
               background: 'rgba(245, 245, 247, 0.7)',
             }}
           >
+            {/* macOS 窗口控制按钮（红、黄、绿） */}
             {['#FF5F57', '#FEBC2E', '#28C840'].map(c => (
               <div key={c} style={{ width: '12px', height: '12px', borderRadius: '50%', background: c }} />
             ))}
+            {/* 窗口标题 */}
             <span
               style={{
                 position: 'absolute',
@@ -283,7 +339,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
             </span>
           </div>
 
-          {/* Profile content */}
+          {/* 个人资料内容 */}
           <div
             key={`card-content-${displayDev}`}
             style={{
@@ -298,11 +354,11 @@ export default function ContributorContent({ progress, activeView, phase, curren
                 : 'opacity 0.15s ease, transform 0.15s ease',
             }}
           >
-            {/* Avatar + name + email */}
+            {/* 头像 + 姓名 + 邮箱 */}
             <div
               className={stylesEffect.cardAvatarSlide}
             >
-              {/* Avatar */}
+              {/* 头像容器 */}
               <div
                 style={{
                   width: '72px',
@@ -320,7 +376,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
-              {/* Name & email */}
+              {/* 姓名和邮箱 */}
               <div>
                 <h2
                   style={{
@@ -356,7 +412,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
               </div>
             </div>
 
-            {/* Traits grid */}
+            {/* 特性网格 */}
             <div
               className={stylesEffect.cardTraitsSlide}
               style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}
@@ -400,7 +456,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
               ))}
             </div>
 
-            {/* Bio quote */}
+            {/* 个人简介 */}
             <div
               className={stylesEffect.cardBioSlide}
               style={{
@@ -424,7 +480,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
               </p>
             </div>
 
-            {/* Skills */}
+            {/* 技术栈 */}
             {contributors[displayDev].skills.length > 0 && (
               <div
                 className={stylesEffect.cardSkillsSlide}
@@ -465,7 +521,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
           </div>
         </div>
 
-        {/* Developer navigation dots */}
+        {/* 贡献者导航点 */}
         <div
           style={{
             display: 'flex',
@@ -511,7 +567,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
           ))}
         </div>
 
-        {/* Page navigation buttons */}
+        {/* 页面导航按钮 */}
         <div
           style={{
             display: 'flex',
@@ -523,6 +579,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
             transition: 'transform 0.7s ease 0.2s, opacity 0.7s ease 0.2s',
           }}
         >
+          {/* 返回开发指南按钮 */}
           <button
             onClick={() => onNavigate('develop')}
             style={{
@@ -554,10 +611,12 @@ export default function ContributorContent({ progress, activeView, phase, curren
             开发
           </button>
 
+          {/* 提示文本 */}
           <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>
             滚轮切换贡献者
           </span>
 
+          {/* 前往下载页面按钮 */}
           <button
             onClick={() => onNavigate('download')}
             style={{
@@ -591,7 +650,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
         </div>
       </div>
 
-      {/* macOS Dock with developer avatars — vertical, right side */}
+      {/* macOS Dock 贡献者头像栏 — 垂直布局，右侧 */}
       {/*
         Magnify logic:
         - Each avatar tracks its own scale via per-item refs updated on mouse-move.
@@ -640,7 +699,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
                 position: 'relative',
               }}
             >
-              {/* Name tooltip — appears to the left of the avatar */}
+              {/* 名称提示框 — 显示在头像左侧 */}
               <div
                 style={{
                   position: 'absolute',
@@ -680,7 +739,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
                 />
               </div>
 
-              {/* Avatar icon */}
+              {/* 头像图标 */}
               <div
                 title={dock.name}
                 onClick={() => onSwitchDev(i)}
@@ -709,7 +768,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
                 />
               </div>
 
-              {/* Active indicator dot */}
+              {/* 选中指示点 */}
               <div
                 style={{
                   width: i === currentDev ? '5px' : '3px',

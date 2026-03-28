@@ -1,3 +1,10 @@
+/**
+ * @file ScrollShowcase.tsx
+ * @description 滚动展示容器组件，管理整个页面的滚动和视图切换
+ * @description 处理页面过渡动画、3D 场景控制、滚轮事件监听等功能
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useRef, useEffect, useCallback, ReactNode } from 'react';
@@ -14,50 +21,107 @@ import DevelopContent from './DevelopContent';
 import ContributorContent from './ContributorContent';
 import DownloadContent from './DownloadContent';
 
+/**
+ * 动态导入 Three.js 场景组件
+ * @description 使用 Next.js 动态导入优化初始加载性能
+ * @description 禁用 SSR 以避免服务端渲染问题
+ */
 const ThreeScene = dynamic(
   () => import('./ThreeScene').then(m => m.ThreeSceneInner),
   { ssr: false }
 ) as ComponentType<{ ref?: React.Ref<ThreeSceneHandle>; activeView: ViewState }>;
 
+/**
+ * 视图目标映射表
+ * @description 定义每个视图在 3D 场景中的目标位置（0~1）
+ * @description 这些值用于控制 3D 场景的相机位置和岛屿旋转
+ */
 const VIEW_TARGET: Record<ViewState, number> = {
-  hero: 0,
-  features: 0.33,
-  branches: 0.55,
-  develop: 0.78,
-  contributors: 1,
-  download: 1,
+  hero: 0,           // 首页：岛屿水平显示
+  features: 0.33,    // 功能页：岛屿开始旋转
+  branches: 0.55,     // 分支页：岛屿继续旋转
+  develop: 0.78,     // 开发页：岛屿接近垂直
+  contributors: 1,    // 贡献者页：岛屿垂直显示
+  download: 1,        // 下载页：与贡献者页相同位置
 };
 
+/**
+ * 页面过渡动画持续时间（毫秒）
+ */
 const DURATION = 800;
 
+/**
+ * 动画阶段状态接口
+ * @description 定义过渡动画的当前阶段和目标视图
+ */
 interface PhaseState {
+  /** 动画阶段：'idle'（静止）或 'transitioning'（过渡中） */
   phase: Phase;
+  /** 过渡目标视图 */
   targetView: ViewState;
 }
 
+/**
+ * 滚动展示容器组件属性接口
+ */
 interface ScrollShowcaseProps {
+  /** 子组件 */
   children?: ReactNode;
+  /** 初始视图 */
   initialView?: ViewState;
 }
 
+/**
+ * 滚动展示容器组件
+ * @description 管理整个页面的滚动交互和视图切换
+ * @description 使用滚轮、点击等方式在各个页面之间切换
+ * @param props - 组件属性
+ * @param props.children - 子组件
+ * @param props.initialView - 初始视图（默认为 'hero'）
+ * @returns JSX.Element
+ */
 export default function ScrollShowcase({ children, initialView = 'hero' }: ScrollShowcaseProps) {
-  /** Stable view after animation completes */
+  // ==================== 状态定义 ====================
+
+  /** 动画完成后的稳定视图 */
   const [view, setView] = useState<ViewState>(initialView);
-  /** Phase + target during transition */
+
+  /** 动画阶段状态（过渡时显示目标视图） */
   const [phaseState, setPhaseState] = useState<PhaseState>({ phase: 'idle', targetView: initialView });
-  /** Local progress 0→1 for CSS animations */
+
+  /** CSS 动画进度（0~1），用于控制内容淡入淡出 */
   const [progress, setProgress] = useState(1);
-  /** Current developer index in the dock (0-4) */
+
+  /** 当前选中的贡献者索引（0~4），对应 Dock 栏 */
   const [currentDev, setCurrentDev] = useState(0);
 
+  // ==================== 引用定义 ====================
+
+  /** Three.js 场景引用，用于控制 3D 动画 */
   const threeRef = useRef<ThreeSceneHandle>(null);
+
+  /** 容器引用，用于滚轮事件监听 */
   const containerRef = useRef<HTMLDivElement>(null);
+
+  /** 是否正在过渡动画中 */
   const isTransitioning = useRef(false);
+
+  /** 动画帧 ID，用于取消动画 */
   const transitionRafRef = useRef<number | null>(null);
 
-  /** Computed: active view during or after animation */
+  // ==================== 计算属性 ====================
+
+  /** 当前激活的视图（动画过程中显示目标视图） */
   const activeView = phaseState.phase === 'idle' ? view : phaseState.targetView;
 
+  // ==================== 页面过渡处理 ====================
+
+  /**
+   * 处理页面过渡动画
+   * @description 根据滚轮方向执行页面切换动画
+   * @description 使用 cubic-bezier 缓动函数实现平滑过渡
+   * @param direction - 滚动方向：'down' 向下滚动，'up' 向上滚动
+   */
   const handleTransition = useCallback((direction: 'down' | 'up') => {
     if (isTransitioning.current) return;
 
@@ -81,10 +145,10 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     const fromTarget = VIEW_TARGET[view];
     const toTarget = VIEW_TARGET[nextView];
 
-    // Immediately signal Three.js the destination
+    // 立即通知 Three.js 目标位置
     threeRef.current?.setViewTarget(toTarget);
 
-    // Begin transition — content should now show targetView
+    // 开始过渡动画
     setPhaseState({ phase: 'transitioning', targetView: nextView });
     setProgress(0);
 
@@ -96,7 +160,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
       const t = Math.min(elapsed / DURATION, 1);
       const eased = 1 - Math.pow(1 - t, 3);
 
-      // easedProgress drives rotation speed — same easing curve as React animation
+      // 缓动进度驱动旋转速度 - 使用与 React 动画相同的缓动曲线
       const easedProgress = fromTarget + (toTarget - fromTarget) * eased;
       threeRef.current?.setTransition(easedProgress);
       setProgress(eased);
@@ -104,7 +168,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
       if (t < 1) {
         transitionRafRef.current = requestAnimationFrame(animate);
       } else {
-        // Animation complete — settle into the new view
+        // 动画完成 - 稳定到新视图
         setView(nextView);
         setPhaseState({ phase: 'idle', targetView: nextView });
         setProgress(1);

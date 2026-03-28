@@ -1,3 +1,11 @@
+/**
+ * @file DevelopContent.tsx
+ * @description 开发指南内容组件
+ * @description 展示各个分支的安装命令和依赖信息，模拟 macOS 终端界面
+ * @description 支持滚轮切换分支、命令行复制、终端内容高度自适应等功能
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -6,15 +14,17 @@ import type { Phase } from '@/data/phase';
 import { developData } from '../data/developData';
 import DesktopIcons from './DesktopIcons';
 
+// 开发内容组件的属性接口
 interface DevelopContentProps {
-  progress: number;
-  activeView: ViewState;
-  phase: Phase;
-  onBackToBranches: () => void;
-  onForwardToContributors: () => void;
-  onNavigate: (view: ViewState) => void;
+  progress: number; // 过渡进度值
+  activeView: ViewState; // 当前激活的视图状态
+  phase: Phase; // 当前动画阶段
+  onBackToBranches: () => void; // 返回分支总览的回调函数
+  onForwardToContributors: () => void; // 前进到贡献者的回调函数
+  onNavigate: (view: ViewState) => void; // 导航到指定视图的回调函数
 }
 
+// 开发内容组件：显示各个分支的安装命令和依赖信息
 export default function DevelopContent({
   progress,
   activeView,
@@ -23,28 +33,41 @@ export default function DevelopContent({
   onForwardToContributors,
   onNavigate,
 }: DevelopContentProps) {
+  // 判断当前是否为开发视图
   const isDevelop = activeView === 'develop';
+  // 判断当前是否处于过渡阶段
   const isTransitioning = phase === 'transitioning';
 
+  // 计算滑出动画的进度
   const slideOut = isTransitioning && activeView === 'branches' ? progress : 0;
+  // 根据滑出进度计算透明度
   const opacity = isDevelop ? Math.max(0, 1 - slideOut) : 0;
+  // 滑入动画因子，控制内容显示
   const slideInFactor = isDevelop ? 1 : 0;
 
+  // 用户选择的分支索引
   const [selectedBranch, setSelectedBranch] = useState(0);
+  // 实际显示的分支索引（用于动画过渡）
   const [displayBranch, setDisplayBranch] = useState(0);
+  // 分支内容是否可见（用于切换动画）
   const [branchVisible, setBranchVisible] = useState(true);
+  // 当前复制的命令行号
   const [copiedLine, setCopiedLine] = useState<number | null>(null);
+  // 终端内容的高度
   const [terminalContentHeight, setTerminalContentHeight] = useState(0);
+  // 终端卡片是否被悬停
   const [cardHovered, setCardHovered] = useState(false);
+  // 用于测量终端内容高度的引用
   const contentMeasuredRef = useRef<HTMLDivElement>(null);
 
+  // 获取当前显示的分支数据
   const currentData = developData[displayBranch];
 
-  // Measure intrinsic content height (scrollHeight is unaffected by maxHeight)
+  // 测量内容的固有高度（scrollHeight不受maxHeight影响）
   const measureHeight = useCallback((): number | null => {
     const el = contentMeasuredRef.current;
     if (!el) return null;
-    // Temporarily reveal so scrollHeight is accurate
+    // 临时显示内容以获取准确的scrollHeight
     el.style.overflow = 'visible';
     el.style.visibility = 'hidden';
     const h = el.scrollHeight;
@@ -53,7 +76,7 @@ export default function DevelopContent({
     return h;
   }, []);
 
-  // Measure via ResizeObserver on content change
+  // 当内容变化时通过ResizeObserver重新测量高度
   const handleResize = useCallback(() => {
     const h = measureHeight();
     if (h !== null && h > 0) {
@@ -61,6 +84,7 @@ export default function DevelopContent({
     }
   }, [measureHeight]);
 
+  // 设置ResizeObserver监听内容大小变化
   useEffect(() => {
     const el = contentMeasuredRef.current;
     if (!el) return;
@@ -69,7 +93,7 @@ export default function DevelopContent({
     return () => ro.disconnect();
   }, [handleResize]);
 
-  // On entering develop view: measure immediately after paint
+  // 进入开发视图时：在绘制后立即测量高度
   useEffect(() => {
     if (!isDevelop) return;
     requestAnimationFrame(() => {
@@ -80,7 +104,7 @@ export default function DevelopContent({
     });
   }, [isDevelop, measureHeight]);
 
-  // Two-phase switch: fade out → switch branch → measure new height → fade in
+  // 两阶段切换分支：淡出 → 切换分支 → 测量新高度 → 淡入
   useEffect(() => {
     if (selectedBranch === displayBranch) return;
     setBranchVisible(false);
@@ -97,6 +121,7 @@ export default function DevelopContent({
     return () => clearTimeout(t1);
   }, [selectedBranch, displayBranch, measureHeight]);
 
+  // 复制命令到剪贴板
   const copyCommand = (cmd: string, lineNum: number) => {
     navigator.clipboard.writeText(cmd).then(() => {
       setCopiedLine(lineNum);
@@ -104,29 +129,36 @@ export default function DevelopContent({
     });
   };
 
+  // 获取macOS风格的当前时间显示
   const getMacTime = () => {
     const now = new Date();
     const h = now.getHours();
     const m = now.getMinutes().toString().padStart(2, '0');
+    // 根据小时判断时段：早上/中午/晚上
     const period = h >= 5 && h < 12 ? '早上' : h >= 12 && h < 18 ? '中午' : '晚上';
     const displayHour = h.toString().padStart(2, '0');
     return `${period} ${displayHour}:${m}`;
   };
 
+  // macOS时间状态
   const [macTime, setMacTime] = useState(getMacTime);
 
+  // 每秒更新macOS时间
   useEffect(() => {
     const tick = () => setMacTime(getMacTime());
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
+  // 监听滚轮事件，在不同分支之间切换
   useEffect(() => {
     if (!isDevelop) return;
     const handleWheel = (e: WheelEvent) => {
+      // 非空闲状态下不响应滚轮
       if (phase !== 'idle') return;
       e.preventDefault();
       if (e.deltaY > 0) {
+        // 向下滚动：切换到下一个分支或前进到贡献者
         if (selectedBranch < developData.length - 1) {
           const next = selectedBranch + 1;
           setSelectedBranch(next);
@@ -135,6 +167,7 @@ export default function DevelopContent({
           onForwardToContributors();
         }
       } else {
+        // 向上滚动：切换到上一个分支或返回分支总览
         if (selectedBranch > 0) {
           const prev = selectedBranch - 1;
           setSelectedBranch(prev);
@@ -148,7 +181,7 @@ export default function DevelopContent({
     return () => window.removeEventListener('wheel', handleWheel);
   }, [isDevelop, phase, selectedBranch, onBackToBranches, onForwardToContributors]);
 
-  // Island-initiated switch: clicking pills on the island switcher row
+  // 监听从Dynamic Island发起的分支切换事件
   useEffect(() => {
     const handleIslandSwitch = (e: Event) => {
       const idx = (e as CustomEvent<number>).detail;
@@ -173,6 +206,7 @@ export default function DevelopContent({
         pointerEvents: isDevelop ? 'auto' : 'none',
         transition: 'opacity 0.3s ease',
         zIndex: 4,
+        // macOS风格的深色渐变背景
         background: 'linear-gradient(160deg, #0a0a0a 0%, #1a1a1a 30%, #2d2d2d 55%, #1a1a1a 75%, #0a0a0a 100%)',
         backgroundSize: '400% 400%',
         animation: 'macBgShift 20s ease infinite',
@@ -180,7 +214,7 @@ export default function DevelopContent({
         paddingTop: '140px',
       }}
     >
-      {/* macOS menu bar */}
+      {/* macOS菜单栏 */}
       <div
         style={{
           position: 'absolute',
@@ -188,6 +222,7 @@ export default function DevelopContent({
           left: 0,
           right: 0,
           height: '28px',
+          // 玻璃拟态效果
           background: 'rgba(30, 30, 30, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
@@ -199,28 +234,35 @@ export default function DevelopContent({
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
+        {/* 应用图标 */}
         <img src="/island_w.svg" alt="" style={{ width: '14px', height: '14px', flexShrink: 0, opacity: 0.95 }} />
+        {/* 应用名称 */}
         <span style={{ fontSize: '12px', fontWeight: '600', color: 'white', letterSpacing: '0.01em' }}>
           Terminal
         </span>
+        {/* 菜单项 */}
         {['Shell', '编辑', '显示', '窗口', '帮助'].map(item => (
           <span key={item} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.75)', letterSpacing: '0.01em' }}>
             {item}
           </span>
         ))}
         <div style={{ flex: 1 }} />
+        {/* 音量图标 */}
         <svg width="14" height="10" viewBox="0 0 14 10" fill="rgba(255,255,255,0.85)">
           <path d="M1 4C1 2.9 1.9 2 3 2h8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V4zm0-1L0 3v4l1-1h12l1 1V3l-1 0H1z" />
           <path d="M4 5h6M4 7h3" stroke="rgba(255,255,255,0.7)" strokeWidth="1" fill="none" />
         </svg>
+        {/* 下拉箭头 */}
         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.01em' }}>▼</span>
+        {/* 缩放比例 */}
         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.85)' }}>100%</span>
+        {/* macOS时间 */}
         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.02em' }}>
           {macTime}
         </span>
       </div>
 
-      {/* Main content */}
+      {/* 主内容区域 */}
       <div
         style={{
           position: 'relative',
@@ -236,7 +278,7 @@ export default function DevelopContent({
           padding: '40px 24px',
         }}
       >
-        {/* Terminal window */}
+        {/* 终端窗口 */}
         <div
           onMouseEnter={() => setCardHovered(true)}
           onMouseLeave={() => setCardHovered(false)}
@@ -244,11 +286,14 @@ export default function DevelopContent({
             width: '100%',
             background: 'rgba(20, 20, 20, 0.95)',
             borderRadius: '12px',
+            // 悬停时边框更明显
             border: `1px solid rgba(255,255,255,${cardHovered ? 0.18 : 0.10})`,
             overflow: 'hidden',
+            // 悬停时阴影效果更强
             boxShadow: cardHovered
               ? '0 16px 64px rgba(0,0,0,0.45), 0 6px 20px rgba(0,0,0,0.25)'
               : '0 24px 80px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.3)',
+            // 悬停时轻微上浮和放大
             transform: cardHovered
               ? 'translateY(-6px) scale(1.015)'
               : `translateY(${(1 - slideInFactor) * 20}px) scale(${slideInFactor})`,
@@ -256,7 +301,7 @@ export default function DevelopContent({
             transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.7s ease 0.1s, box-shadow 0.4s ease, border-color 0.3s ease',
           }}
         >
-          {/* Terminal title bar */}
+          {/* 终端标题栏 */}
           <div
             style={{
               padding: '12px 16px',
@@ -267,9 +312,11 @@ export default function DevelopContent({
               background: 'rgba(30, 30, 30, 0.8)',
             }}
           >
+            {/* 红黄绿三色窗口控制按钮 */}
             {['#FF5F57', '#FEBC2E', '#28C840'].map(c => (
               <div key={c} style={{ width: '12px', height: '12px', borderRadius: '50%', background: c }} />
             ))}
+            {/* 窗口标题 */}
             <span
               style={{
                 flex: 1,
@@ -284,7 +331,7 @@ export default function DevelopContent({
             </span>
           </div>
 
-          {/* Terminal content — fade + height animated on branch switch */}
+          {/* 终端内容区域 - 分支切换时有淡入淡出和高度动画 */}
           <div
             style={{
               maxHeight: branchVisible ? `${terminalContentHeight}px` : '0px',
@@ -294,6 +341,7 @@ export default function DevelopContent({
                 : 'max-height 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
+            {/* 终端内容包裹层 - 用于测量高度 */}
             <div
               ref={contentMeasuredRef}
               style={{
@@ -308,13 +356,13 @@ export default function DevelopContent({
                   : 'opacity 0.15s ease, transform 0.15s ease',
               }}
             >
-            {/* Branch info */}
+            {/* 分支信息展示 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+              {/* 分支标签 */}
               <div
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  // justifyContent: 'center',
                   padding: '4px 10px',
                   background: `${currentData.accent}12`,
                   border: `1px solid ${currentData.accent}28`,
@@ -325,14 +373,16 @@ export default function DevelopContent({
                   {currentData.name}
                 </span>
               </div>
+              {/* 分支标语 */}
               <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontWeight: '500' }}>
                 {currentData.tagline}
               </span>
             </div>
 
-            {/* Install methods */}
+            {/* 安装方法列表 */}
             {currentData.installMethods.map((method, methodIdx) => (
               <div key={method.title}>
+                {/* 方法标题 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                   <span style={{ fontSize: '11px', fontWeight: '700', color: '#28C840', fontFamily: 'ui-monospace, monospace' }}>
                     #
@@ -340,12 +390,14 @@ export default function DevelopContent({
                   <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.02em' }}>
                     {method.title}
                   </span>
+                  {/* 方法说明 */}
                   {method.note && (
                     <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginLeft: '4px' }}>
                       {method.note}
                     </span>
                   )}
                 </div>
+                {/* 命令代码块 */}
                 <div
                   style={{
                     background: 'rgba(0,0,0,0.3)',
@@ -355,6 +407,7 @@ export default function DevelopContent({
                   }}
                 >
                   {method.commands.map((cmd, cmdIdx) => {
+                    // 计算全局行号
                     const globalLine = currentData.installMethods
                       .slice(0, methodIdx)
                       .reduce((sum, m) => sum + m.commands.length, 0) + cmdIdx + 1;
@@ -368,13 +421,16 @@ export default function DevelopContent({
                           borderBottom: cmdIdx < method.commands.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
                         }}
                       >
+                        {/* 行号 */}
                         <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', fontFamily: 'ui-monospace, monospace', width: '24px', flexShrink: 0 }}>
                           {globalLine}
                         </span>
+                        {/* 命令内容 */}
                         <code
                           style={{
                             flex: 1,
                             fontSize: '12px',
+                            // 注释行颜色较浅
                             color: cmd.startsWith('#') ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)',
                             fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                             letterSpacing: '0.02em',
@@ -382,6 +438,7 @@ export default function DevelopContent({
                         >
                           {cmd}
                         </code>
+                        {/* 复制按钮 - 注释行不显示 */}
                         {!cmd.startsWith('#') && (
                           <button
                             onClick={() => copyCommand(cmd, globalLine)}
@@ -392,6 +449,7 @@ export default function DevelopContent({
                               fontWeight: '600',
                               cursor: 'pointer',
                               border: 'none',
+                              // 复制成功后显示绿色
                               background: copiedLine === globalLine
                                 ? 'rgba(40, 200, 64, 0.2)'
                                 : 'rgba(255,255,255,0.08)',
@@ -412,13 +470,15 @@ export default function DevelopContent({
               </div>
             ))}
 
-            {/* Requirements */}
+            {/* 依赖要求 */}
             {currentData.requirements && (
               <div style={{ marginTop: '8px' }}>
+                {/* 标题 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                   <span style={{ fontSize: '11px', fontWeight: '700', color: '#FEBC2E', fontFamily: 'ui-monospace, monospace' }}>!</span>
                   <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.85)' }}>依赖要求</span>
                 </div>
+                {/* 依赖标签列表 */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {currentData.requirements.map(req => (
                     <span
@@ -444,7 +504,7 @@ export default function DevelopContent({
           </div>
         </div>
 
-        {/* Navigation dots */}
+        {/* 分支导航点 */}
         <div
           style={{
             display: 'flex',
@@ -462,12 +522,14 @@ export default function DevelopContent({
               onClick={() => { setSelectedBranch(i); window.dispatchEvent(new CustomEvent('pyisland:branch-select', { detail: i })); }}
               title={item.name}
               style={{
+                // 当前选中的分支显示为长条
                 width: i === displayBranch ? '24px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
                 background: i === displayBranch
                   ? 'rgba(255,255,255,0.9)'
                   : 'rgba(255,255,255,0.25)',
+                // 选中的点有发光效果
                 boxShadow: i === displayBranch ? '0 0 6px rgba(255,255,255,0.4)' : 'none',
                 border: 'none',
                 cursor: 'pointer',
@@ -475,6 +537,7 @@ export default function DevelopContent({
                 padding: 0,
               }}
               onMouseEnter={e => {
+                // 悬停时非选中点稍微变长
                 if (i !== displayBranch) {
                   e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
                   e.currentTarget.style.width = '12px';
@@ -490,7 +553,7 @@ export default function DevelopContent({
           ))}
         </div>
 
-        {/* Navigation hint */}
+        {/* 导航提示按钮 */}
         <div
           style={{
             marginTop: '20px',
@@ -502,6 +565,7 @@ export default function DevelopContent({
             transition: 'transform 0.7s ease 0.2s, opacity 0.7s ease 0.2s',
           }}
         >
+          {/* 返回分支总览按钮 */}
           <button
             onClick={onBackToBranches}
             style={{
@@ -533,10 +597,12 @@ export default function DevelopContent({
             分支总览
           </button>
 
+          {/* 中间提示文字 */}
           <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>
             滚轮切换版本
           </span>
 
+          {/* 前进到贡献者按钮 */}
           <button
             onClick={onForwardToContributors}
             style={{
@@ -570,6 +636,7 @@ export default function DevelopContent({
         </div>
       </div>
 
+      {/* macOS桌面图标 */}
       <DesktopIcons activeView={activeView} onNavigate={onNavigate} />
     </div>
   );

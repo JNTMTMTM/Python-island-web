@@ -1,11 +1,30 @@
+/**
+ * @file contributorData.ts
+ * @description 贡献者数据定义
+ * @description 包含所有项目贡献者的信息和展示数据
+ * @author 鸡哥
+ */
+
+/**
+ * 贡献者接口
+ * @description 定义贡献者的完整信息结构
+ */
 export interface Contributor {
+  /** 贡献者唯一标识 */
   id: string;
+  /** 中文名称 */
   name: string;
+  /** 英文名称（大写） */
   nameEn: string;
+  /** Dock 栏显示标签 */
   dockLabel: string;
+  /** 电子邮箱 */
   email: string;
+  /** 个人简介 */
   bio: string;
+  /** 特征数组（图标、标签、描述） */
   traits: { icon: string; label: string; desc: string }[];
+  /** 技能标签数组 */
   skills: { label: string }[];
 }
 

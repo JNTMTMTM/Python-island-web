@@ -1,3 +1,11 @@
+/**
+ * @file FeaturesContent.tsx
+ * @description 功能特性内容组件
+ * @description 展示 Pyisland 的六大核心功能（智能展开 / 亮度 / 音量 / 状态监控 / 剪贴板 / 拖动）
+ * @description 以双列卡片布局呈现，支持滑入动画和悬停光效扫过效果
+ * @author 鸡哥
+ */
+
 'use client';
 
 import {
@@ -12,6 +20,7 @@ import stylesGlass from '@/styles/glass.module.css';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 
+// 功能特性卡片数据
 const features = [
   {
     icon: MousePointerClick,
@@ -51,6 +60,10 @@ const features = [
   },
 ];
 
+/**
+ * 功能特性卡片组件
+ * 显示单个功能特性，支持滑入动画
+ */
 function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
   icon: typeof MousePointerClick;
   title: string;
@@ -58,6 +71,7 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
   slideIn: number;
   delay: number;
 }) {
+  // 计算卡片透明度和过渡延迟
   const cardOpacity = slideIn;
   const transitionDelay = `${Math.min(delay, 2) * 80}ms`;
 
@@ -73,6 +87,7 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
         transition: `opacity 1s ease ${transitionDelay}, transform 0.7s ease ${transitionDelay}, background 0.3s ease, border-color 0.3s ease`,
       }}
     >
+      {/* 顶部装饰线 */}
       <div
         aria-hidden="true"
         style={{
@@ -88,6 +103,7 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
         }}
         className="card-accent-line"
       />
+      {/* 图标容器 */}
       <div
         style={{
           width: '40px',
@@ -105,6 +121,7 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
       >
         <Icon size={18} color="#1D1D1F" />
       </div>
+      {/* 标题 */}
       <h3
         style={{
           fontSize: '16px',
@@ -116,6 +133,7 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
       >
         {title}
       </h3>
+      {/* 描述文本 */}
       <p
         style={{
           fontSize: '13px',
@@ -129,6 +147,10 @@ function FeatureCard({ icon: Icon, title, description, slideIn, delay }: {
   );
 }
 
+/**
+ * 功能特性内容组件
+ * 在 features 视图中展示所有功能特性卡片
+ */
 interface FeaturesContentProps {
   progress: number;
   activeView: ViewState;
@@ -136,12 +158,15 @@ interface FeaturesContentProps {
 }
 
 export default function FeaturesContent({ progress, activeView, phase }: FeaturesContentProps) {
+  // 判断当前是否为 features 视图
   const isFeatures = activeView === 'features';
+  // 判断是否处于过渡状态
   const isTransitioning = phase === 'transitioning';
 
-  // Slide-in factor: during features→branches transition (progress 0→1), features should fade/slide out
+  // 滑出因子：features→branches 过渡期间（progress 0→1），features 应该淡出/滑出
   const slideOut = isTransitioning && activeView === 'branches' ? progress : 0;
 
+  // 计算透明度和滑入因子
   const opacity = isFeatures ? Math.max(0, 1 - slideOut) : 0;
   const slideInFactor = isFeatures ? 1 : 0;
 
@@ -156,7 +181,7 @@ export default function FeaturesContent({ progress, activeView, phase }: Feature
         zIndex: 4,
       }}
     >
-      {/* Left column — 3 cards stacked */}
+      {/* 左列：3张卡片堆叠 */}
       <div
         style={{
           position: 'absolute',
@@ -181,7 +206,7 @@ export default function FeaturesContent({ progress, activeView, phase }: Feature
         ))}
       </div>
 
-      {/* Right column — 3 cards stacked */}
+      {/* 右列：3张卡片堆叠 */}
       <div
         style={{
           position: 'absolute',

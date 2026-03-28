@@ -1,3 +1,11 @@
+/**
+ * @file HeroContent.tsx
+ * @description 首页主要展示区域内容组件
+ * @description 首页 Hero 区域，包含副标题、主标题、描述文案和操作按钮
+ * @description 支持入场交错动画（副标题→标题→描述→按钮）和鼠标悬停交互
+ * @author 鸡哥
+ */
+
 'use client';
 
 import { Download, Github } from 'lucide-react';
@@ -7,6 +15,10 @@ import stylesEffect from '@/styles/effect.module.css';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 
+/**
+ * Hero 区域内容组件
+ * 首页主要展示区域，包含标题、描述和操作按钮
+ */
 interface HeroContentProps {
   threeRef: { current: { setHover: (val: boolean) => void } | null };
   progress: number;
@@ -15,13 +27,15 @@ interface HeroContentProps {
 }
 
 export default function HeroContent({ threeRef, progress, activeView, phase }: HeroContentProps) {
+  // 判断当前是否为 hero 视图
   const isHero = activeView === 'hero';
 
-  // Slide-out: when transitioning hero→features, progress goes 0→1, hero should fade/slide out
+  // 滑出效果：hero→features 过渡期间（progress 0→1），hero 应该淡出/滑出
   const slideOut = phase === 'transitioning' && activeView !== 'hero' ? progress : 0;
-  // Slide-in: when transitioning features→hero, hero appears and slides up into place
+  // 滑入效果：features→hero 过渡期间，hero 出现并向上滑入
   const slideIn = isHero && phase === 'transitioning' ? progress : 1;
 
+  // 计算透明度和垂直位移
   const opacity = isHero ? Math.max(0, 1 - slideOut) * slideIn : 0;
   const translateY = isHero ? -slideOut * 80 + (1 - slideIn) * 50 : 0;
 
@@ -55,6 +69,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
           gap: '20px',
         }}
       >
+        {/* 副标题 */}
         <span
           className={isHero ? stylesEffect.heroSubtitleAnim : ''}
           style={{
@@ -69,6 +84,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
           Windows Dynamic Island
         </span>
 
+        {/* 主标题 */}
         <h1
           className={`${stylesTypography.textHero} ${stylesEffect.gradientText} ${isHero ? stylesEffect.heroTitleAnim : ''}`}
           style={{ letterSpacing: '-0.02em', opacity: isHero ? undefined : 0 }}
@@ -76,6 +92,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
           Pyisland
         </h1>
 
+        {/* 描述文本 */}
         <p
           className={isHero ? stylesEffect.heroDescAnim : ''}
           style={{
@@ -90,6 +107,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
           Windows 灵动岛新时代 — 打造现代控制中心
         </p>
 
+        {/* 操作按钮 */}
         <div
           className={isHero ? stylesEffect.heroButtonsAnim : ''}
           style={{
@@ -101,6 +119,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
             opacity: isHero ? undefined : 0,
           }}
         >
+          {/* 下载按钮 */}
           <a
             href="/download"
             className={stylesButton.btnSecondary}
@@ -110,6 +129,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
             <Download size={16} />
             立即下载
           </a>
+          {/* 文档按钮 */}
           <a
             href="/"
             className={stylesButton.btnPrimary}
