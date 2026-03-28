@@ -1,0 +1,13 @@
+/* macOS Dock bounce animation */
+@keyframes appBounce {
+  0%   { transform: scale(1) translateY(0px); }
+  20%  { transform: scale(1.32) translateY(-14px); }
+  40%  { transform: scale(1.22) translateY(-8px); }
+  60%  { transform: scale(1.28) translateY(-11px); }
+  80%  { transform: scale(1.24) translateY(-6px); }
+  100% { transform: scale(1) translateY(0px); }
+}
+
+.bounce {
+  animation: appBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

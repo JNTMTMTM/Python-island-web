@@ -291,6 +291,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         phase={phaseState.phase}
         onBackToBranches={() => navigateTo('branches')}
         onForwardToContributors={() => navigateTo('contributors')}
+        onNavigate={navigateTo}
       />
 
       {/* Back button */}
@@ -312,6 +313,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         phase={phaseState.phase}
         onBackToContributors={() => navigateTo('contributors')}
         onBackToHome={() => navigateTo('hero')}
+        onNavigate={navigateTo}
       />
     </div>
   );

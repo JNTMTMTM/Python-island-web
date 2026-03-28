@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 import { developData } from '../data/developData';
+import DesktopIcons from './DesktopIcons';
 
 interface DevelopContentProps {
   progress: number;
@@ -11,6 +12,7 @@ interface DevelopContentProps {
   phase: Phase;
   onBackToBranches: () => void;
   onForwardToContributors: () => void;
+  onNavigate: (view: ViewState) => void;
 }
 
 export default function DevelopContent({
@@ -19,6 +21,7 @@ export default function DevelopContent({
   phase,
   onBackToBranches,
   onForwardToContributors,
+  onNavigate,
 }: DevelopContentProps) {
   const isDevelop = activeView === 'develop';
   const isTransitioning = phase === 'transitioning';
@@ -566,6 +569,8 @@ export default function DevelopContent({
           </button>
         </div>
       </div>
+
+      <DesktopIcons activeView={activeView} onNavigate={onNavigate} />
     </div>
   );
 }

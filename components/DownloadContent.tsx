@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 import { downloadBranches } from '@/data/downloadData';
+import DesktopIcons from './DesktopIcons';
 
 interface DownloadContentProps {
   progress: number;
@@ -11,6 +12,7 @@ interface DownloadContentProps {
   phase: Phase;
   onBackToContributors: () => void;
   onBackToHome: () => void;
+  onNavigate: (view: ViewState) => void;
 }
 
 type Branch = typeof downloadBranches[number];
@@ -28,6 +30,7 @@ export default function DownloadContent({
   phase,
   onBackToContributors,
   onBackToHome,
+  onNavigate,
 }: DownloadContentProps) {
   const isDownload = activeView === 'download';
   const isTransitioning = phase === 'transitioning';
@@ -626,6 +629,8 @@ export default function DownloadContent({
           {"\u00A9"} 2026 - present Python Island. All rights reserved.
         </span>
       </div>
+
+      <DesktopIcons activeView={activeView} onNavigate={onNavigate} />
     </div>
   );
 }

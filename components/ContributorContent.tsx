@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import stylesEffect from '@/styles/effect.module.css';
 import stylesDock from '@/styles/dock.module.css';
+import DesktopIcons from './DesktopIcons';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
 import { contributors } from '../data/contributorData';
@@ -732,6 +733,8 @@ export default function ContributorContent({ progress, activeView, phase, curren
           );
         })}
       </div>
+
+      <DesktopIcons activeView={activeView} onNavigate={onNavigate} />
     </div>
   );
 }
