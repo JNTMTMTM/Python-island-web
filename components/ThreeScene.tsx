@@ -94,30 +94,30 @@ export const ThreeSceneInner = forwardRef<ThreeSceneHandle, ThreeSceneInnerProps
     const { width, height } = container.getBoundingClientRect();
     if (!width || !height) return;
 
-    // 创建场景
-    const { scene, camera, renderer } = createScene(container);
+  // 创建场景
+  const { scene, camera, renderer } = createScene(container);
 
-    // 添加灯光
-    addLights(scene);
+  // 添加灯光
+  addLights(scene);
 
-    // 创建岛屿组（包含胶囊体和内部光效）
-    const { group: islandGroup, pill, glow, glowMat } = createIslandGroup();
-    scene.add(islandGroup);
+  // 创建岛屿组（包含胶囊体和内部光效）
+  const { group: islandGroup, pill, glow, glowMat } = createIslandGroup();
+  scene.add(islandGroup);
 
-    // 创建外部光效层
-    const outerGlowLayers: GlowLayer[] = createOuterGlowLayers(islandGroup);
+  // 创建外部光效层
+  const outerGlowLayers: GlowLayer[] = createOuterGlowLayers(islandGroup);
 
-    // 创建核心光效
-    const coreMat: THREE.MeshBasicMaterial = createCoreGlow(islandGroup);
+  // 创建核心光效
+  const coreMat: THREE.MeshBasicMaterial = createCoreGlow(islandGroup);
 
-    // 创建粒子系统
-    const { points: particles, mat: particleMat } = createParticles(scene);
+  // 创建粒子系统
+  const { points: particles, mat: particleMat } = createParticles(scene);
 
-    // 创建射线检测器，用于鼠标悬停检测
-    const raycaster = new THREE.Raycaster();
+  // 创建射线检测器（用于鼠标悬停检测）
+  const raycaster = new THREE.Raycaster();
 
-    // 创建鼠标跟踪器
-    const { mouse, onMouseMove } = createMouseTracker();
+  // 创建鼠标跟踪器
+  const { mouse, onMouseMove } = createMouseTracker();
     window.addEventListener('mousemove', onMouseMove);
 
     // 创建动画状态

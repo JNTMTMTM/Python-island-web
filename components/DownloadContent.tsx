@@ -108,7 +108,7 @@ export default function DownloadContent({
     return () => clearTimeout(t1);
   }, [selectedIdx, displayIdx]);
 
-  // Sync island switcher on mount (first card selected)
+  // 挂载时同步动态岛切换器（默认选中第一张卡片）
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: 0 }));
   }, []);
@@ -130,7 +130,7 @@ export default function DownloadContent({
     return () => clearInterval(id);
   }, []);
 
-  // Wheel: up → previous card (or contributors if at first), down → next card (or home if at last)
+  // 滚轮切换：向上滚动→上一页（已是第一张则跳转贡献者），向下滚动→下一页（已是最后一张则跳转首页）
   const handleWheel = useCallback((e: WheelEvent) => {
     if (!isDownload || phase !== 'idle') return;
     if (e.deltaY < 0) {
@@ -159,7 +159,7 @@ export default function DownloadContent({
     return () => window.removeEventListener('wheel', handleWheel);
   }, [handleWheel]);
 
-  // Island-initiated switch: clicking pills on the island switcher row
+  // 动态岛发起的切换：点击动态岛上的分支选择器
   useEffect(() => {
     const handleIslandSwitch = (e: Event) => {
       const idx = (e as CustomEvent<number>).detail;
@@ -196,7 +196,7 @@ export default function DownloadContent({
         paddingTop: '88px',
       }}
     >
-      {/* macOS menu bar */}
+      {/* macOS 菜单栏 */}
       <div
         style={{
           position: 'absolute',
@@ -236,7 +236,7 @@ export default function DownloadContent({
         </span>
       </div>
 
-      {/* Main content */}
+      {/* 主内容区域 */}
       <div
         style={{
           position: 'relative',
@@ -251,7 +251,7 @@ export default function DownloadContent({
           padding: '40px 24px',
         }}
       >
-        {/* Terminal window */}
+        {/* 终端窗口 */}
         <div
           onMouseEnter={() => setCardHovered(true)}
           onMouseLeave={() => setCardHovered(false)}
@@ -272,7 +272,7 @@ export default function DownloadContent({
             transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.7s ease 0.1s, box-shadow 0.4s ease, border-color 0.3s ease',
           }}
         >
-          {/* Window title bar */}
+          {/* 窗口标题栏 */}
           <div
             style={{
               padding: '12px 16px',
@@ -307,7 +307,7 @@ export default function DownloadContent({
             </span>
           </div>
 
-          {/* Branch content — fades in/out on switch */}
+          {/* 分支内容 — 切换时淡入淡出 */}
           <div
             key={branch.id}
             style={{
@@ -322,10 +322,10 @@ export default function DownloadContent({
                 : 'opacity 0.15s ease, transform 0.15s ease',
             }}
           >
-            {/* Header */}
+            {/* 头部信息 */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', position: 'relative', zIndex: 1 }}>
               <div style={{ flex: 1 }}>
-                {/* Tagline badge */}
+                {/* 标语徽章 */}
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -345,7 +345,7 @@ export default function DownloadContent({
                   </span>
                 </div>
 
-                {/* Branch name */}
+                {/* 分支名称 */}
                 <h3 style={{
                   fontSize: '20px',
                   fontWeight: '700',
@@ -368,7 +368,7 @@ export default function DownloadContent({
 
             </div>
 
-            {/* Feature list */}
+            {/* 特性列表 */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', position: 'relative', zIndex: 1 }}>
               {branch.features.map((feature) => (
                 <div key={feature} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -389,7 +389,7 @@ export default function DownloadContent({
               ))}
             </div>
 
-            {/* Audience */}
+            {/* 适用人群 */}
             <div style={{
               padding: '11px 14px',
               background: 'rgba(0,0,0,0.22)',
@@ -404,7 +404,7 @@ export default function DownloadContent({
               {branch.audience}
             </div>
 
-            {/* Download button */}
+            {/* 下载按钮 */}
             <div style={{ position: 'relative', zIndex: 1 }}>
               {branch.downloadLabel === '立即下载' ? (
                 <button
@@ -482,7 +482,7 @@ export default function DownloadContent({
             </div>
           </div>
 
-          {/* Status bar */}
+          {/* 状态栏 */}
           <div style={{
             padding: '10px 16px',
             borderTop: '1px solid rgba(255,255,255,0.04)',
@@ -506,7 +506,7 @@ export default function DownloadContent({
           </div>
         </div>
 
-        {/* Navigation dots */}
+        {/* 导航指示点 */}
         <div
           style={{
             display: 'flex',
@@ -552,7 +552,7 @@ export default function DownloadContent({
           ))}
         </div>
 
-        {/* Navigation buttons */}
+        {/* 导航按钮 */}
         <div
           style={{
             display: 'flex',
@@ -636,7 +636,7 @@ export default function DownloadContent({
         </div>
       </div>
 
-      {/* Footer — BeiAn + Copyright */}
+      {/* 页脚 — 备案信息 + 版权声明 */}
       <div
         style={{
           position: 'absolute',

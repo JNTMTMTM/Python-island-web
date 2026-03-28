@@ -180,7 +180,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     transitionRafRef.current = requestAnimationFrame(animate);
   }, [view]);
 
-  // URL hash sync
+  // URL 哈希同步
   useEffect(() => {
     const hash = `#${activeView}`;
     if (window.location.hash !== hash) {
@@ -189,16 +189,16 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     }
   }, [activeView]);
 
-  // Initialize Three.js to initialView on mount
+  // 挂载时初始化 Three.js 至初始视图
   useEffect(() => {
     if (initialView !== 'hero' && threeRef.current) {
       const target = VIEW_TARGET[initialView];
       threeRef.current.setViewTarget(target);
       threeRef.current.setTransition(target);
     }
-  }, []); // run once on mount
+  }, []); // 仅在挂载时执行一次
 
-  // Direct cross-page navigation — handles any target jump
+  // 跨页直接导航 — 支持任意目标跳转
   const navigateTo = useCallback((target: ViewState) => {
     if (VIEW_TARGET[target] === undefined) return;
 
@@ -258,7 +258,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     return () => window.removeEventListener('pyisland:navigate', handleNavigate);
   }, [navigateTo]);
 
-  // Switch to a specific contributor and show the contributors view
+  // 切换到指定贡献者并显示贡献者视图
   const switchToContributor = useCallback((index: number) => {
     setCurrentDev(index);
     if (view !== 'contributors') {
@@ -266,13 +266,13 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
     }
   }, [view, navigateTo]);
 
-  // Wheel scroll
+  // 滚轮滚动
   useEffect(() => {
     let accumulator = 0;
     let timer: ReturnType<typeof setTimeout>;
 
     const handleWheel = (e: WheelEvent) => {
-      // Don't intercept wheel when in contributors, develop, or download views — they handle their own wheel
+      // 在贡献者、开发指南、下载页面中不拦截滚轮事件 — 由各自页面自行处理
       if (view === 'contributors' || view === 'develop' || view === 'download') return;
       e.preventDefault();
       accumulator += e.deltaY;
@@ -306,7 +306,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         userSelect: 'none',
       }}
     >
-      {/* Background gradient */}
+      {/* 背景渐变 */}
       <div
         aria-hidden="true"
         style={{
@@ -318,12 +318,12 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         }}
       />
 
-      {/* Three.js Canvas */}
+      {/* Three.js 画布 */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 2 }}>
         <ThreeScene ref={threeRef} activeView={activeView} />
       </div>
 
-      {/* Hero */}
+      {/* 首页 */}
       <HeroContent
         threeRef={threeRef}
         progress={progress}
@@ -331,24 +331,24 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         phase={phaseState.phase}
       />
 
-      {/* Scroll indicator — only in hero */}
+      {/* 滚动指示器 — 仅在首页显示 */}
       <ScrollIndicator activeView={activeView} />
 
-      {/* Features */}
+      {/* 功能页 */}
       <FeaturesContent
         progress={progress}
         activeView={activeView}
         phase={phaseState.phase}
       />
 
-      {/* Branches */}
+      {/* 分支页 */}
       <BranchesContent
         progress={progress}
         activeView={activeView}
         phase={phaseState.phase}
       />
 
-      {/* Develop */}
+      {/* 开发页 */}
       <DevelopContent
         progress={progress}
         activeView={activeView}
@@ -358,9 +358,9 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         onNavigate={navigateTo}
       />
 
-      {/* Back button */}
+      {/* 返回按钮 */}
 
-      {/* Contributors */}
+      {/* 贡献者页 */}
       <ContributorContent
         progress={progress}
         activeView={activeView}
@@ -370,7 +370,7 @@ export default function ScrollShowcase({ children, initialView = 'hero' }: Scrol
         onNavigate={navigateTo}
       />
 
-      {/* Download */}
+      {/* 下载页 */}
       <DownloadContent
         progress={progress}
         activeView={activeView}

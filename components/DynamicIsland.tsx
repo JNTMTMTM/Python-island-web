@@ -310,7 +310,7 @@ export default function DynamicIsland() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Outer glow */}
+        {/* 外部光晕 */}
         <div
           style={{
             position: 'absolute',
@@ -327,7 +327,7 @@ export default function DynamicIsland() {
           }}
         />
 
-        {/* Island body */}
+        {/* 岛屿主体 */}
         <div
           style={{
             position: 'relative',
@@ -345,7 +345,7 @@ export default function DynamicIsland() {
             transition: 'border-radius 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94), min-width 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
           }}
         >
-          {/* Nav row */}
+          {/* 导航栏 */}
           <div
             style={{
               display: 'flex',
@@ -356,7 +356,7 @@ export default function DynamicIsland() {
               minWidth: '470px',
             }}
           >
-            {/* Left logo */}
+            {/* 左侧 Logo */}
             <button
               onClick={() => navigate('#hero')}
               style={{
@@ -385,7 +385,7 @@ export default function DynamicIsland() {
               </span>
             </button>
 
-            {/* Divider */}
+            {/* 分割线 */}
             <div
               style={{
                 width: '1px',
@@ -396,7 +396,7 @@ export default function DynamicIsland() {
               }}
             />
 
-            {/* Nav links */}
+            {/* 导航链接 */}
             <div
               onMouseEnter={(e) => e.stopPropagation()}
               onMouseLeave={(e) => e.stopPropagation()}
@@ -492,7 +492,7 @@ export default function DynamicIsland() {
               >
                 下载
               </button>
-              {/* Active indicator underline */}
+              {/* 激活指示器下划线 */}
               <div
                 style={{
                   position: 'absolute',
@@ -509,7 +509,7 @@ export default function DynamicIsland() {
               />
             </div>
 
-            {/* Divider */}
+            {/* 分割线 */}
             <div
               style={{
                 width: '1px',
@@ -520,7 +520,7 @@ export default function DynamicIsland() {
               }}
             />
 
-            {/* GitHub icon */}
+            {/* GitHub 图标 */}
             <a
               href="https://github.com/Python-island/Python-island"
               target="_blank"
@@ -544,7 +544,7 @@ export default function DynamicIsland() {
               <Github size={16} />
             </a>
 
-            {/* Docs icon */}
+            {/* 文档图标 */}
             <a
               href="https://docs.pyisland.com"
               target="_blank"
@@ -572,7 +572,7 @@ export default function DynamicIsland() {
             </a>
           </div>
 
-          {/* Title section */}
+          {/* 标题区域 */}
           <div
             style={{
               maxHeight: showTitle ? '80px' : '0px',
@@ -610,7 +610,7 @@ export default function DynamicIsland() {
             </span>
           </div>
 
-          {/* Branch switcher row — visible on #develop page */}
+          {/* 分支切换器行 — 在 #develop 页面可见 */}
           <div
             style={{
               maxHeight: activePage === '#develop' ? '72px' : '0px',
@@ -623,7 +623,7 @@ export default function DynamicIsland() {
               borderTop: activePage === '#develop' ? '1px solid rgba(255,255,255,0.06)' : 'none',
             }}
           >
-            {/* Index label */}
+            {/* 索引标签 */}
             <div
               style={{
                 fontSize: '10px',
@@ -672,7 +672,7 @@ export default function DynamicIsland() {
             </div>
           </div>
 
-          {/* Download branch switcher row — visible on #download page */}
+          {/* 下载分支切换器行 — 在 #download 页面可见 */}
           <div
             style={{
               maxHeight: activePage === '#download' ? '72px' : '0px',
@@ -685,7 +685,7 @@ export default function DynamicIsland() {
               borderTop: activePage === '#download' ? '1px solid rgba(255,255,255,0.06)' : 'none',
             }}
           >
-            {/* Index label */}
+            {/* 索引标签 */}
             <div
               style={{
                 fontSize: '10px',

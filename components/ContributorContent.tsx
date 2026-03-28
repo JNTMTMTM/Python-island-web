@@ -120,14 +120,14 @@ export default function ContributorContent({ progress, activeView, phase, curren
       e.preventDefault();
 
       if (e.deltaY > 0) {
-        // Scroll down: at last dev go to download, else next dev
+        // 向下滚动：已是最后一位贡献者则跳转下载页，否则切换到下一位
         if (currentDev === contributors.length - 1) {
           onNavigate('download');
         } else {
           onSwitchDev(currentDev + 1);
         }
         } else {
-          // Scroll up: go to prev contributor, or back to develop at first
+          // 向上滚动：切换到上一位贡献者，若已是第一位则返回开发页
           if (currentDev > 0) {
             onSwitchDev(currentDev - 1);
           } else {
@@ -174,7 +174,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
     const rect = container.getBoundingClientRect();
     const mouseY = e.clientY - rect.top;
 
-    // First item center (accounting for top padding of 14px)
+    // 第一个图标中心（考虑顶部内边距 14px）
     const firstCenter = 14 + 26; // 顶部内边距 + 图标一半高度
     const idx = Math.round((mouseY - firstCenter) / ITEM_W);
     const clampedIdx = Math.max(0, Math.min(dockAvatars.length - 1, idx));
@@ -229,7 +229,7 @@ export default function ContributorContent({ progress, activeView, phase, curren
         paddingTop: '88px',
       }}
     >
-      {/* macOS menu bar */}
+      {/* macOS 菜单栏 */}
       <div
         style={{
           position: 'absolute',

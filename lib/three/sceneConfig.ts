@@ -6,7 +6,11 @@
  * @author 鸡哥
  */
 
-// 场景配置常量
+/**
+ * @description 场景配置常量
+ * @description 定义相机、渲染器、灯光、岛屿几何、光效、粒子、动画等所有视觉参数
+ * @description 所有数值集中管理，便于调优和主题切换
+ */
 
 export const SCENE_CONFIG = {
   // 相机配置
