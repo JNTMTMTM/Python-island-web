@@ -20,8 +20,6 @@ const BRANCH_COLORS: Record<string, { glow: string; glowDim: string }> = {
   'pyisland-wanku':  { glow: 'rgba(139,92,246,0.26)', glowDim: 'rgba(139,92,246,0.10)' },
 };
 
-const CONTENT_W = 620;
-
 export default function DownloadContent({
   progress,
   activeView,
@@ -38,7 +36,7 @@ export default function DownloadContent({
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [displayIdx, setDisplayIdx] = useState(0);
   const [contentVisible, setContentVisible] = useState(true);
-  const [windowHovered, setWindowHovered] = useState(false);
+  const [cardHovered, setCardHovered] = useState(false);
 
   // Two-phase switch: fade out → switch → fade in; also sync island switcher
   useEffect(() => {
@@ -108,21 +106,21 @@ export default function DownloadContent({
   return (
     <div
       style={{
-        position: 'fixed',
+        position: 'absolute',
         inset: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         opacity,
-        transform: `translateY(${(1 - opacity) * 16}px)`,
-        transition: opacity < 1 ? 'none' : 'opacity 0.6s ease, transform 0.6s ease',
         pointerEvents: isDownload ? 'auto' : 'none',
-        zIndex: 10,
+        transition: 'opacity 0.3s ease',
+        zIndex: 4,
         background: 'linear-gradient(160deg, #0a0a0a 0%, #1a1a1a 30%, #2d2d2d 55%, #1a1a1a 75%, #0a0a0a 100%)',
         backgroundSize: '400% 400%',
         animation: 'macBgShift 20s ease infinite',
         overflow: 'hidden',
+        paddingTop: '88px',
       }}
     >
       {/* macOS menu bar */}
@@ -133,9 +131,9 @@ export default function DownloadContent({
           left: 0,
           right: 0,
           height: '28px',
-          background: 'rgba(28, 28, 30, 0.88)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          background: 'rgba(30, 30, 30, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           display: 'flex',
           alignItems: 'center',
           padding: '0 12px',
@@ -149,12 +147,12 @@ export default function DownloadContent({
           Downloads
         </span>
         {['文件', '编辑', '显示', '窗口', '帮助'].map(item => (
-          <span key={item} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.70)', letterSpacing: '0.01em' }}>
+          <span key={item} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.75)', letterSpacing: '0.01em' }}>
             {item}
           </span>
         ))}
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.88)', letterSpacing: '0.02em' }}>
+        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)', letterSpacing: '0.02em' }}>
           {macTime}
         </span>
       </div>
@@ -168,40 +166,42 @@ export default function DownloadContent({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          transform: `translateY(${(1 - slideInFactor) * 60}px)`,
+          transform: `translateY(${(1 - slideInFactor) * 80}px)`,
           opacity: slideInFactor,
           transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease',
-          padding: '100px 24px 40px',
+          padding: '40px 24px',
         }}
       >
-        {/* Terminal window — now contains everything */}
+        {/* Terminal window */}
         <div
-          onMouseEnter={() => setWindowHovered(true)}
-          onMouseLeave={() => setWindowHovered(false)}
+          onMouseEnter={() => setCardHovered(true)}
+          onMouseLeave={() => setCardHovered(false)}
           style={{
             width: '100%',
-            maxWidth: `${CONTENT_W}px`,
-            background: 'rgba(18, 18, 20, 0.90)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderRadius: '16px',
-            border: `1px solid rgba(255,255,255,${windowHovered ? 0.14 : 0.09})`,
+            maxWidth: '640px',
+            background: 'rgba(20, 20, 20, 0.95)',
+            borderRadius: '12px',
+            border: `1px solid rgba(255,255,255,${cardHovered ? 0.18 : 0.10})`,
             overflow: 'hidden',
-            boxShadow: windowHovered
-              ? `0 32px 96px rgba(0,0,0,0.6), 0 0 48px ${colors.glow}, inset 0 1px 0 rgba(255,255,255,0.09)`
-              : '0 32px 96px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07)',
-            transition: 'box-shadow 0.4s ease, border-color 0.3s ease',
+            boxShadow: cardHovered
+              ? '0 16px 64px rgba(0,0,0,0.45), 0 6px 20px rgba(0,0,0,0.25)'
+              : '0 24px 80px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.3)',
+            transform: cardHovered
+              ? 'translateY(-6px) scale(1.015)'
+              : `translateY(${(1 - slideInFactor) * 20}px) scale(${slideInFactor})`,
+            opacity: slideInFactor,
+            transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.7s ease 0.1s, box-shadow 0.4s ease, border-color 0.3s ease',
           }}
         >
           {/* Window title bar */}
           <div
             style={{
-              padding: '13px 16px',
+              padding: '12px 16px',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              borderBottom: '1px solid rgba(255,255,255,0.055)',
-              background: 'rgba(255,255,255,0.025)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(30, 30, 30, 0.8)',
             }}
           >
             {['#FF5F57', '#FEBC2E', '#28C840'].map((c, i) => (
@@ -218,7 +218,7 @@ export default function DownloadContent({
                 flex: 1,
                 textAlign: 'center',
                 fontSize: '12px',
-                color: 'rgba(255,255,255,0.42)',
+                color: 'rgba(255,255,255,0.5)',
                 fontWeight: '500',
                 fontFamily: "'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
                 letterSpacing: '0.02em',
@@ -232,33 +232,17 @@ export default function DownloadContent({
           <div
             key={branch.id}
             style={{
-              padding: '28px 32px',
+              padding: '24px 24px',
               display: 'flex',
               flexDirection: 'column',
               gap: '20px',
               opacity: contentVisible ? 1 : 0,
-              transform: contentVisible ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.98)',
+              transform: contentVisible ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.98)',
               transition: contentVisible
                 ? 'opacity 0.22s ease 0.10s, transform 0.22s ease 0.10s'
                 : 'opacity 0.15s ease, transform 0.15s ease',
             }}
           >
-            {/* Ambient glow */}
-            <div style={{
-              position: 'absolute',
-              top: '80px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '400px',
-              height: '200px',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${colors.glowDim} 0%, transparent 70%)`,
-              opacity: windowHovered ? 0.8 : 0,
-              transition: 'opacity 0.5s ease',
-              pointerEvents: 'none',
-              zIndex: 0,
-            }} />
-
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', position: 'relative', zIndex: 1 }}>
               <div style={{ flex: 1 }}>
@@ -266,7 +250,7 @@ export default function DownloadContent({
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  padding: '4px 12px',
+                  padding: '4px 10px',
                   background: `${branch.accentBg}`,
                   border: `1px solid ${branch.accentBorder}`,
                   borderRadius: '20px',
@@ -274,10 +258,9 @@ export default function DownloadContent({
                 }}>
                   <span style={{
                     fontSize: '10px',
-                    fontWeight: '700',
+                    fontWeight: '600',
                     color: branch.accentColor,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
+                    letterSpacing: '0.03em',
                   }}>
                     {branch.tagline}
                   </span>
@@ -285,8 +268,8 @@ export default function DownloadContent({
 
                 {/* Branch name */}
                 <h3 style={{
-                  fontSize: '22px',
-                  fontWeight: '800',
+                  fontSize: '20px',
+                  fontWeight: '700',
                   color: 'rgba(255,255,255,0.96)',
                   letterSpacing: '-0.02em',
                   marginBottom: '6px',
@@ -296,7 +279,7 @@ export default function DownloadContent({
                 </h3>
                 <p style={{
                   fontSize: '13px',
-                  color: 'rgba(255,255,255,0.38)',
+                  color: 'rgba(255,255,255,0.50)',
                   lineHeight: 1.6,
                   margin: 0,
                 }}>
@@ -306,9 +289,9 @@ export default function DownloadContent({
 
               {/* Label badge */}
               <div style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '14px',
+                width: '52px',
+                height: '52px',
+                borderRadius: '12px',
                 background: `linear-gradient(135deg, ${branch.accentBg} 0%, rgba(255,255,255,0.04) 100%)`,
                 border: `1px solid ${branch.accentBorder}`,
                 display: 'flex',
@@ -316,11 +299,11 @@ export default function DownloadContent({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                boxShadow: windowHovered ? `0 0 28px ${colors.glow}` : 'none',
+                boxShadow: cardHovered ? `0 0 28px ${colors.glow}` : 'none',
                 transition: 'box-shadow 0.4s ease',
               }}>
                 <span style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: '900',
                   color: branch.accentColor,
                   letterSpacing: '-0.01em',
@@ -329,9 +312,9 @@ export default function DownloadContent({
                 }}>
                   {branch.label}
                 </span>
-                <div style={{ width: '20px', height: '1px', background: `${branch.accentBorder}`, margin: '4px 0' }} />
+                <div style={{ width: '18px', height: '1px', background: `${branch.accentBorder}`, margin: '3px 0' }} />
                 <span style={{
-                  fontSize: '8px',
+                  fontSize: '7px',
                   fontWeight: '700',
                   color: `${branch.accentColor}88`,
                   letterSpacing: '0.06em',
@@ -353,7 +336,7 @@ export default function DownloadContent({
                     background: branch.accentColor,
                     flexShrink: 0,
                     marginTop: '6px',
-                    boxShadow: windowHovered ? `0 0 8px ${branch.accentColor}90` : 'none',
+                    boxShadow: cardHovered ? `0 0 8px ${branch.accentColor}90` : 'none',
                     transition: 'box-shadow 0.3s ease',
                   }} />
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.50)', lineHeight: 1.55 }}>
@@ -367,7 +350,7 @@ export default function DownloadContent({
             <div style={{
               padding: '11px 14px',
               background: 'rgba(0,0,0,0.22)',
-              borderRadius: '10px',
+              borderRadius: '8px',
               fontSize: '12px',
               color: 'rgba(255,255,255,0.38)',
               border: '1px solid rgba(255,255,255,0.05)',
@@ -385,7 +368,7 @@ export default function DownloadContent({
                   onClick={() => window.open(branch.downloadUrl, '_blank')}
                   style={{
                     width: '100%',
-                    padding: '12px 20px',
+                    padding: '11px 20px',
                     borderRadius: '10px',
                     fontSize: '13px',
                     fontWeight: '700',
@@ -422,7 +405,7 @@ export default function DownloadContent({
               ) : (
                 <div style={{
                   width: '100%',
-                  padding: '12px 20px',
+                  padding: '11px 20px',
                   borderRadius: '10px',
                   fontSize: '13px',
                   fontWeight: '600',
@@ -450,7 +433,7 @@ export default function DownloadContent({
 
           {/* Status bar */}
           <div style={{
-            padding: '10px 20px',
+            padding: '10px 16px',
             borderTop: '1px solid rgba(255,255,255,0.04)',
             background: 'rgba(255,255,255,0.015)',
             display: 'flex',
@@ -493,13 +476,13 @@ export default function DownloadContent({
               onClick={() => { setSelectedIdx(i); window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: i })); }}
               title={b.name}
               style={{
-                width: i === displayIdx ? '26px' : '8px',
+                width: i === displayIdx ? '24px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
                 background: i === displayIdx
                   ? 'rgba(255,255,255,0.90)'
-                  : 'rgba(255,255,255,0.22)',
-                boxShadow: i === displayIdx ? '0 0 8px rgba(255,255,255,0.5)' : 'none',
+                  : 'rgba(255,255,255,0.25)',
+                boxShadow: i === displayIdx ? '0 0 8px rgba(255,255,255,0.4)' : 'none',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -513,7 +496,7 @@ export default function DownloadContent({
               }}
               onMouseLeave={e => {
                 if (i !== displayIdx) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.22)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
                   e.currentTarget.style.width = '8px';
                 }
               }}
@@ -526,9 +509,9 @@ export default function DownloadContent({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            marginTop: '14px',
-            opacity: slideInFactor,
+            gap: '16px',
+            marginTop: '16px',
+            opacity: slideInFactor * 0.6,
             transform: `translateY(${(1 - slideInFactor) * 20}px)`,
             transition: 'transform 0.7s ease 0.2s, opacity 0.7s ease 0.2s',
           }}
@@ -539,27 +522,25 @@ export default function DownloadContent({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '9px 18px',
+              padding: '8px 16px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: '600',
               cursor: 'pointer',
-              border: '1px solid rgba(255,255,255,0.13)',
-              background: 'rgba(255,255,255,0.07)',
-              color: 'rgba(255,255,255,0.68)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.7)',
               transition: 'all 0.2s ease',
               fontFamily: 'inherit',
               letterSpacing: '0.02em',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.13)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.92)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.30)';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.13)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.68)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -568,7 +549,9 @@ export default function DownloadContent({
             贡献者
           </button>
 
-          <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.12)' }} />
+          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>
+            滚轮切换版本
+          </span>
 
           <button
             onClick={() => window.location.href = '/'}
@@ -576,39 +559,32 @@ export default function DownloadContent({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '9px 18px',
+              padding: '8px 16px',
               borderRadius: '10px',
               fontSize: '12px',
               fontWeight: '600',
               cursor: 'pointer',
-              border: '1px solid rgba(255,255,255,0.13)',
-              background: 'rgba(255,255,255,0.07)',
-              color: 'rgba(255,255,255,0.68)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.7)',
               transition: 'all 0.2s ease',
               fontFamily: 'inherit',
               letterSpacing: '0.02em',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.13)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.92)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.30)';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.07)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.13)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.68)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
             返回首页
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </button>
-
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.05em', marginLeft: '4px' }}>
-            滚轮切换版本
-          </span>
         </div>
       </div>
     </div>
