@@ -51,7 +51,7 @@ export const downloadBranches: DownloadBranch[] = [
       '更低的资源占用',
     ],
     audience: '追求性能和轻量化的用户',
-    downloadUrl: 'https://download.pyisland.com/download/DynamicIsland_0.2.0_x64-setup.exe',
+    downloadUrl: 'https://download.pyisland.com/download/DynamicIsland_0.3.5_x64-setup.exe',
     downloadLabel: '立即下载',
     badge: '高性能',
     accentColor: '#059669',
