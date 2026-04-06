@@ -51,7 +51,7 @@ export const downloadBranches: DownloadBranch[] = [
       '成熟开源生态，依赖维护活跃',
     ],
     audience: '追求功能完整、开源可控、跨平台体验的用户',
-    downloadUrl: 'https://download.pyisland.com/download/eIsland-26.1.0-Setup.exe',
+    downloadUrl: 'https://download.pyisland.com/download/eIsland-26.1.1-beta.1-Setup.exe',
     downloadLabel: '立即下载',
     badge: '旗舰版',
     accentColor: '#2563EB',
