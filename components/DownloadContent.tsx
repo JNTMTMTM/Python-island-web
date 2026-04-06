@@ -654,24 +654,71 @@ export default function DownloadContent({
           zIndex: 5,
         }}
       >
-        <a
-          href="https://beian.miit.gov.cn"
-          target="_blank"
-          rel="noopener noreferrer"
+        <div
           style={{
-            fontSize: '11px',
-            color: 'rgba(255,255,255,0.50)',
-            textDecoration: 'none',
-            letterSpacing: '0.03em',
-            fontFamily: "'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-            transition: 'color 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: '8px 14px',
             pointerEvents: 'auto',
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.50)'; }}
         >
-          苏ICP备2026009305号-2
-        </a>
+          <a
+            href="https://beian.miit.gov.cn"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: '11px',
+              color: 'rgba(255,255,255,0.50)',
+              textDecoration: 'none',
+              letterSpacing: '0.03em',
+              fontFamily: "'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.50)'; }}
+          >
+            苏ICP备2026009305号-2
+          </a>
+          <span
+            aria-hidden
+            style={{
+              fontSize: '10px',
+              color: 'rgba(255,255,255,0.22)',
+              userSelect: 'none',
+            }}
+          >
+            |
+          </span>
+          <a
+            href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=32011502013770"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '11px',
+              color: 'rgba(255,255,255,0.50)',
+              textDecoration: 'none',
+              letterSpacing: '0.03em',
+              fontFamily: "'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.50)'; }}
+          >
+            <img
+              src="/gabatb.png"
+              alt=""
+              width={14}
+              height={14}
+              style={{ width: '14px', height: '14px', flexShrink: 0, objectFit: 'contain', display: 'block' }}
+            />
+            苏公网安备32011502013770号
+          </a>
+        </div>
         <span style={{
           fontSize: '10px',
           color: 'rgba(255,255,255,0.30)',
