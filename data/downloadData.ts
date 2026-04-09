@@ -38,6 +38,29 @@ export interface DownloadBranch {
   label: string;
 }
 
+/**
+ * 版本接口返回数据结构
+ * @description 对应 pyisland-admin 的 AppVersion 实体字段
+ */
+interface VersionItem {
+  /** 应用名称 */
+  appName: string;
+  /** 下载链接 */
+  downloadUrl: string;
+}
+
+/**
+ * 版本列表接口响应结构
+ */
+interface VersionListResponse {
+  /** 业务状态码 */
+  code: number;
+  /** 响应消息 */
+  message: string;
+  /** 版本列表数据 */
+  data?: VersionItem[];
+}
+
 export const downloadBranches: DownloadBranch[] = [
   {
     id: 'eisland',
@@ -51,7 +74,7 @@ export const downloadBranches: DownloadBranch[] = [
       '成熟开源生态，依赖维护活跃',
     ],
     audience: '追求功能完整、开源可控、跨平台体验的用户',
-    downloadUrl: 'https://download.pyisland.com/download/eIsland-26.1.1-beta.2-Setup.exe',
+    downloadUrl: '',
     downloadLabel: '立即下载',
     badge: '旗舰版',
     accentColor: '#2563EB',
@@ -71,7 +94,7 @@ export const downloadBranches: DownloadBranch[] = [
       '更低的资源占用',
     ],
     audience: '追求性能和轻量化的用户',
-    downloadUrl: 'https://download.pyisland.com/download/DynamicIsland_0.3.5_x64-setup.exe',
+    downloadUrl: '',
     downloadLabel: '立即下载',
     badge: '高性能',
     accentColor: '#059669',
@@ -91,7 +114,7 @@ export const downloadBranches: DownloadBranch[] = [
       '支持守护进程后台运行',
     ],
     audience: '追求轻量化和低资源占用的用户',
-    downloadUrl: 'https://docs.pyisland.com/download.html',
+    downloadUrl: '',
     downloadLabel: '即将推出',
     badge: '轻量版',
     accentColor: '#D97706',
@@ -111,7 +134,7 @@ export const downloadBranches: DownloadBranch[] = [
       '社区支持完善，文档齐全',
     ],
     audience: '追求稳定可靠的用户',
-    downloadUrl: 'https://download.pyisland.com/download/PyIsland_1.7.1_x64.zip',
+    downloadUrl: '',
     downloadLabel: '立即下载',
     badge: '稳定版',
     accentColor: '#FFFFFF',
@@ -131,7 +154,7 @@ export const downloadBranches: DownloadBranch[] = [
       '毛玻璃效果和多巴胺配色',
     ],
     audience: '追求高颜值和丰富功能的用户',
-    downloadUrl: 'https://docs.pyisland.com/download.html',
+    downloadUrl: '',
     downloadLabel: '即将推出',
     badge: '美化版',
     accentColor: '#FACC15',
@@ -140,3 +163,106 @@ export const downloadBranches: DownloadBranch[] = [
     label: 'WK',
   },
 ];
+
+const DEFAULT_ADMIN_API_BASE_URL = 'https://server.pyisland.com/api';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_ADMIN_API_BASE_URL ?? DEFAULT_ADMIN_API_BASE_URL).replace(/\/$/, '');
+const VERSION_ENDPOINTS = API_BASE_URL.endsWith('/api')
+  ? [`${API_BASE_URL}/v1/version/list`, `${API_BASE_URL.replace(/\/api$/, '')}/v1/version/list`]
+  : [`${API_BASE_URL}/api/v1/version/list`, `${API_BASE_URL}/v1/version/list`];
+
+const APP_NAME_ALIASES: Record<string, string[]> = {
+  eisland: ['eisland'],
+  'tauri-island': ['tauri-island', 'tauri'],
+  pyislandqt: ['pyislandqt'],
+  pyislandpyside6: ['pyislandpyside6', 'pyisland'],
+  'pyisland-wanku': ['pyisland-wanku'],
+};
+
+let cachedDynamicBranches: DownloadBranch[] | null = null;
+let loadingPromise: Promise<DownloadBranch[]> | null = null;
+
+/**
+ * 获取下载分支数据（含动态 downloadUrl）
+ * @description 从 pyisland-admin 的版本接口拉取下载地址并合并到分支数据
+ * @returns 合并后的下载分支数组
+ */
+export async function getDownloadBranches(): Promise<DownloadBranch[]> {
+  if (cachedDynamicBranches) {
+    return cachedDynamicBranches;
+  }
+
+  if (loadingPromise) {
+    return loadingPromise;
+  }
+
+  loadingPromise = fetchVersionList()
+    .then(versionList => {
+      const merged = mergeDownloadBranches(versionList);
+      cachedDynamicBranches = merged;
+      return merged;
+    })
+    .catch(() => {
+      const fallback = mergeDownloadBranches([]);
+      cachedDynamicBranches = fallback;
+      return fallback;
+    })
+    .finally(() => {
+      loadingPromise = null;
+    });
+
+  return loadingPromise;
+}
+
+/**
+ * 拉取版本列表数据
+ * @returns 版本列表
+ */
+async function fetchVersionList(): Promise<VersionItem[]> {
+  for (const endpoint of VERSION_ENDPOINTS) {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        continue;
+      }
+
+      const payload = (await response.json()) as VersionListResponse;
+      if (payload.code === 200 && Array.isArray(payload.data)) {
+        return payload.data;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [];
+}
+
+/**
+ * 合并静态分支与动态下载地址
+ * @param versionList 版本接口返回列表
+ * @returns 合并后的下载分支
+ */
+function mergeDownloadBranches(versionList: VersionItem[]): DownloadBranch[] {
+  const versionMap = new Map(versionList.map(item => [item.appName.trim().toLowerCase(), item.downloadUrl ?? '']));
+
+  return downloadBranches.map(branch => {
+    const aliases = APP_NAME_ALIASES[branch.id] ?? [branch.id];
+    const matchedUrl = aliases
+      .map(alias => versionMap.get(alias.trim().toLowerCase()) ?? '')
+      .find(url => url.trim().length > 0);
+
+    const hasDynamicUrl = Boolean(matchedUrl);
+
+    return {
+      ...branch,
+      downloadUrl: hasDynamicUrl ? matchedUrl! : '',
+      downloadLabel: hasDynamicUrl ? '立即下载' : '即将推出',
+    };
+  });
+}

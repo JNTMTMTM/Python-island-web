@@ -10,7 +10,8 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { Github } from 'lucide-react';
 import { developData } from '../data/developData';
-import { downloadBranches } from '../data/downloadData';
+import { downloadBranches, getDownloadBranches } from '../data/downloadData';
+import type { DownloadBranch } from '../data/downloadData';
 
 /**
  * 导航页面类型定义
@@ -58,6 +59,9 @@ export default function DynamicIsland() {
 
   /** 当前选中的下载分支索引（0~3），对应 downloadBranches 数组 */
   const [selectedDownload, setSelectedDownload] = useState(0);
+
+  /** 下载分支数据（含动态下载地址） */
+  const [downloadOptions, setDownloadOptions] = useState<DownloadBranch[]>(downloadBranches);
 
   // ==================== 引用定义 ====================
 
@@ -184,6 +188,34 @@ export default function DynamicIsland() {
     window.addEventListener('pyisland:download-select', handleDownloadSelect);
     return () => window.removeEventListener('pyisland:download-select', handleDownloadSelect);
   }, [selectedDownload]);
+
+  /**
+   * 加载动态下载分支数据
+   * @description 从版本接口拉取 downloadUrl 并同步到动态岛下载切换器
+   */
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadDownloadOptions = async () => {
+      const branches = await getDownloadBranches();
+      if (!cancelled) {
+        setDownloadOptions(branches);
+      }
+    };
+
+    void loadDownloadOptions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedDownload >= downloadOptions.length) {
+      setSelectedDownload(0);
+      window.dispatchEvent(new CustomEvent('pyisland:island-download-select', { detail: 0 }));
+    }
+  }, [downloadOptions.length, selectedDownload]);
 
   // ==================== 切换处理函数 ====================
 
@@ -696,7 +728,7 @@ export default function DynamicIsland() {
                 userSelect: 'none',
               }}
             >
-              {selectedDownload + 1} / {downloadBranches.length}
+              {selectedDownload + 1} / {downloadOptions.length}
             </div>
             <div
               style={{
@@ -708,7 +740,7 @@ export default function DynamicIsland() {
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease',
               }}
             >
-              {downloadBranches.map((item, i) => (
+              {downloadOptions.map((item, i) => (
                 <button
                   key={item.id}
                   onClick={() => handleIslandDownloadSwitch(i)}

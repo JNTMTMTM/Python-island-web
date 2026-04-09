@@ -10,7 +10,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ViewState } from '@/data/viewState';
 import type { Phase } from '@/data/phase';
-import { downloadBranches } from '@/data/downloadData';
+import { downloadBranches, getDownloadBranches } from '@/data/downloadData';
+import type { DownloadBranch } from '@/data/downloadData';
 import DesktopIcons from './DesktopIcons';
 
 /**
@@ -30,9 +31,6 @@ interface DownloadContentProps {
   /** 导航到指定页面回调 */
   onNavigate: (view: ViewState) => void;
 }
-
-/** 下载分支类型 */
-type Branch = typeof downloadBranches[number];
 
 /**
  * 分支颜色配置
@@ -91,6 +89,26 @@ export default function DownloadContent({
   /** 卡片是否悬停 */
   const [cardHovered, setCardHovered] = useState(false);
 
+  /** 下载分支数据（含动态下载地址） */
+  const [branches, setBranches] = useState<DownloadBranch[]>(downloadBranches);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadBranches = async () => {
+      const dynamicBranches = await getDownloadBranches();
+      if (!cancelled) {
+        setBranches(dynamicBranches);
+      }
+    };
+
+    void loadBranches();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // ==================== 切换动画 ====================
 
   /**
@@ -145,7 +163,7 @@ export default function DownloadContent({
       }
     } else {
       e.preventDefault();
-      if (selectedIdx === downloadBranches.length - 1) {
+      if (selectedIdx === branches.length - 1) {
         onBackToHome();
       } else {
         const next = selectedIdx + 1;
@@ -153,7 +171,7 @@ export default function DownloadContent({
         window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: next }));
       }
     }
-  }, [isDownload, phase, onBackToContributors, onBackToHome, selectedIdx]);
+  }, [branches.length, isDownload, phase, onBackToContributors, onBackToHome, selectedIdx]);
 
   useEffect(() => {
     window.addEventListener('wheel', handleWheel, { passive: false });
@@ -164,17 +182,31 @@ export default function DownloadContent({
   useEffect(() => {
     const handleIslandSwitch = (e: Event) => {
       const idx = (e as CustomEvent<number>).detail;
-      if (idx !== selectedIdx && idx >= 0 && idx < downloadBranches.length) {
+      if (idx !== selectedIdx && idx >= 0 && idx < branches.length) {
         setSelectedIdx(idx);
       }
     };
     window.addEventListener('pyisland:island-download-select', handleIslandSwitch);
     return () => window.removeEventListener('pyisland:island-download-select', handleIslandSwitch);
-  }, [selectedIdx]);
+  }, [branches.length, selectedIdx]);
+
+  useEffect(() => {
+    if (displayIdx >= branches.length) {
+      setDisplayIdx(0);
+      setSelectedIdx(0);
+      setContentVisible(true);
+      window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: 0 }));
+    }
+  }, [branches.length, displayIdx]);
 
   if (opacity === 0 && !isDownload) return null;
 
-  const branch = downloadBranches[displayIdx];
+  const branch = branches[displayIdx];
+
+  if (!branch) {
+    return null;
+  }
+
   const colors = BRANCH_COLORS[branch.id] ?? { glow: 'rgba(255,255,255,0.15)', glowDim: 'rgba(255,255,255,0.06)' };
 
   return (
@@ -304,7 +336,7 @@ export default function DownloadContent({
                 letterSpacing: '0.02em',
               }}
             >
-              ~/pyisland/downloads — {displayIdx + 1} / {downloadBranches.length}
+              ~/pyisland/downloads — {displayIdx + 1} / {branches.length}
             </span>
           </div>
 
@@ -501,7 +533,7 @@ export default function DownloadContent({
                 boxShadow: '0 0 6px #28C84088',
               }} />
               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.02em' }}>
-                {downloadBranches.filter(b => b.downloadLabel === '立即下载').length} 个版本可下载
+                {branches.filter(b => b.downloadLabel === '立即下载').length} 个版本可下载
               </span>
             </div>
           </div>
@@ -519,7 +551,7 @@ export default function DownloadContent({
             transition: 'transform 0.7s ease 0.15s, opacity 0.7s ease 0.15s',
           }}
         >
-          {downloadBranches.map((b, i) => (
+          {branches.map((b, i) => (
             <button
               key={b.id}
               onClick={() => { setSelectedIdx(i); window.dispatchEvent(new CustomEvent('pyisland:download-select', { detail: i })); }}
