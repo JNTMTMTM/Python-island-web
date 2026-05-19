@@ -11,10 +11,10 @@
 import {
   MousePointerClick,
   Sun,
-  Volume2,
+  Brain,
   Activity,
   Clipboard,
-  Move,
+  Sprout,
 } from 'lucide-react';
 import stylesGlass from '@/styles/glass.module.css';
 import type { ViewState } from '@/data/viewState';
@@ -31,13 +31,13 @@ const features = [
   {
     icon: Sun,
     title: '亮度调节',
-    description: '滑动条调节系统亮度，支持防抖机制 — 平滑调节，精准控制屏幕亮度。',
+    description: '使用DDC/CI协议调节屏幕亮度，支持防抖机制 — 能够直接操控外置显示器亮度。',
     accent: '#1D1D1F',
   },
   {
-    icon: Volume2,
-    title: '音量控制',
-    description: '实时调节系统音量 — 一触即达，告别传统托盘图标点击。',
+    icon: Brain,
+    title: '内置AI',
+    description: '内置AI助手，能直接对系统进行操作 — 提供快捷操作，提升效率。',
     accent: '#1D1D1F',
   },
   {
@@ -53,9 +53,9 @@ const features = [
     accent: '#1D1D1F',
   },
   {
-    icon: Move,
-    title: '鼠标拖动',
-    description: '支持鼠标拖动调整灵动岛位置 — 自由摆放，随心所欲。',
+    icon: Sprout,
+    title: '优秀性能',
+    description: '开发以性能表现与稳定性为目标 — 确保在各种场景下都能提供流畅的体验。',
     accent: '#1D1D1F',
   },
 ];
