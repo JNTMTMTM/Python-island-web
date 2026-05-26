@@ -104,7 +104,7 @@ export default function HeroContent({ threeRef, progress, activeView, phase }: H
             opacity: isHero ? undefined : 0,
           }}
         >
-          Windows 灵动岛新时代 — 打造现代控制中心
+          Eisland与tauri分支现已全面接入AI
         </p>
 
         {/* 操作按钮 */}
